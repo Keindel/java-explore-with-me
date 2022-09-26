@@ -4,9 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ExploreWithMeMain {
+public class ExploreWithMeStatistics {
 
     public static void main(String[] args) {
-        new SpringApplication(ExploreWithMeMain.class).run(args);
+        SpringApplication.run(ExploreWithMeStatistics.class, args);
     }
 }
