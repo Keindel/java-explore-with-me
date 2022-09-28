@@ -6,11 +6,11 @@
 package ru.practicum.explorewithme.api;
 
 import ru.practicum.explorewithme.model.ApiError;
-import ru.practicum.explorewithme.model.EventFullDto;
-import ru.practicum.explorewithme.model.EventShortDto;
-import ru.practicum.explorewithme.model.NewEventDto;
+import ru.practicum.explorewithme.model.event.EventFullDto;
+import ru.practicum.explorewithme.model.event.EventShortDto;
+import ru.practicum.explorewithme.model.event.NewEventDto;
 import ru.practicum.explorewithme.model.ParticipationRequestDto;
-import ru.practicum.explorewithme.model.UpdateEventRequest;
+import ru.practicum.explorewithme.model.event.UpdateEventRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;

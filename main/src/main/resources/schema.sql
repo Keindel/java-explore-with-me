@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS categories
 (
     id   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
-    name VARCHAR(32)                                     NOT NULL
+    name VARCHAR(32)                                     NOT NULL UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS locations

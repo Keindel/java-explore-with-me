@@ -6,7 +6,7 @@
 package ru.practicum.explorewithme.api;
 
 import ru.practicum.explorewithme.model.ApiError;
-import ru.practicum.explorewithme.model.CategoryDto;
+import ru.practicum.explorewithme.model.category.CategoryDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;

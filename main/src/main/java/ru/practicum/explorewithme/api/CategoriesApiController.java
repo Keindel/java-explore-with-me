@@ -1,6 +1,6 @@
 package ru.practicum.explorewithme.api;
 
-import ru.practicum.explorewithme.model.CategoryDto;
+import ru.practicum.explorewithme.model.category.CategoryDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;

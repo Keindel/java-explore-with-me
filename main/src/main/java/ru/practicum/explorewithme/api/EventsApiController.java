@@ -1,7 +1,7 @@
 package ru.practicum.explorewithme.api;
 
-import ru.practicum.explorewithme.model.EventFullDto;
-import ru.practicum.explorewithme.model.EventShortDto;
+import ru.practicum.explorewithme.model.event.EventFullDto;
+import ru.practicum.explorewithme.model.event.EventShortDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
