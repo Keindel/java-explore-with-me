@@ -5,6 +5,8 @@ import ru.practicum.explorewithme.model.AdminUpdateEventRequest;
 import ru.practicum.explorewithme.model.category.Category;
 import ru.practicum.explorewithme.model.category.CategoryDto;
 import ru.practicum.explorewithme.model.category.NewCategoryDto;
+import ru.practicum.explorewithme.model.compilation.Compilation;
+import ru.practicum.explorewithme.model.compilation.NewCompilationDto;
 import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.user.NewUserRequest;
 import ru.practicum.explorewithme.model.user.User;
@@ -31,4 +33,16 @@ public interface AdminService {
     Event publishEvent(Long eventId);
 
     Event rejectEvent(Long eventId);
+
+    Compilation saveCompilation(NewCompilationDto newCompilationDto);
+
+    HttpStatus deleteCompilation(Long compId);
+
+    HttpStatus removeEventFromCompilation(Long compId, Long eventId);
+
+    HttpStatus addEventToCompilation(Long compId, Long eventId);
+
+    HttpStatus unpinCompilation(Long compId);
+
+    HttpStatus pinCompilation(Long compId);
 }

@@ -1,101 +1,51 @@
 package ru.practicum.explorewithme.model;
 
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
+import org.hibernate.Hibernate;
 import org.springframework.validation.annotation.Validated;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.util.Objects;
 
 /**
  * Широта и долгота места проведения события
  */
-@Schema(description = "Широта и долгота места проведения события")
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-09-19T14:46:57.997Z[GMT]")
-
-
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
+@Entity
+@Table(name = "locations")
 public class Location   {
-  @JsonProperty("lat")
-  private Float lat = null;
 
-  @JsonProperty("lon")
-  private Float lon = null;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-  public Location lat(Float lat) {
-    this.lat = lat;
-    return this;
-  }
+  @NotNull
+  private BigDecimal lat;
 
-  /**
-   * Широта
-   * @return lat
-   **/
-  @Schema(example = "55.754167", description = "Широта")
-  
-    public Float getLat() {
-    return lat;
-  }
+  @NotNull
+  private BigDecimal lon;
 
-  public void setLat(Float lat) {
-    this.lat = lat;
-  }
+  private String name;
 
-  public Location lon(Float lon) {
-    this.lon = lon;
-    return this;
-  }
-
-  /**
-   * Долгота
-   * @return lon
-   **/
-  @Schema(example = "37.62", description = "Долгота")
-  
-    public Float getLon() {
-    return lon;
-  }
-
-  public void setLon(Float lon) {
-    this.lon = lon;
-  }
-
+  private Integer radius;
 
   @Override
-  public boolean equals(java.lang.Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
     Location location = (Location) o;
-    return Objects.equals(this.lat, location.lat) &&
-        Objects.equals(this.lon, location.lon);
+    return id != null && Objects.equals(id, location.id);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(lat, lon);
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class Location {\n");
-    
-    sb.append("    lat: ").append(toIndentedString(lat)).append("\n");
-    sb.append("    lon: ").append(toIndentedString(lon)).append("\n");
-    sb.append("}");
-    return sb.toString();
-  }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(java.lang.Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
+    return getClass().hashCode() + Objects.hashCode(id);
   }
 }

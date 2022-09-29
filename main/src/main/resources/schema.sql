@@ -6,11 +6,11 @@ CREATE TABLE IF NOT EXISTS categories
 
 CREATE TABLE IF NOT EXISTS locations
 (
-    id        BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
-    latitude  DECIMAL(9, 6)                                   NOT NULL,
-    longitude DECIMAL(9, 6)                                   NOT NULL,
-    name      VARCHAR(32),
-    radius    INT
+    id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
+    lat    DECIMAL(9, 6)                                   NOT NULL,
+    lon    DECIMAL(9, 6)                                   NOT NULL,
+    name   VARCHAR(32),
+    radius INT
 );
 
 CREATE TABLE IF NOT EXISTS users

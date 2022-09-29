@@ -32,13 +32,9 @@ import java.util.List;
 @RequestMapping(path = "/admin")
 public class AdminApiController implements AdminApi {
 
-    private final ObjectMapper objectMapper;
-
     private final ModelMapper modelMapper;
 
     private final ListModelMapper listModelMapper;
-
-    private final HttpServletRequest request;
 
     private final AdminService adminService;
 
@@ -80,6 +76,7 @@ public class AdminApiController implements AdminApi {
                 HttpStatus.OK);
     }
 
+    @GetMapping("/events")
     public ResponseEntity<List<EventFullDto>> getEventsDetailed(@Valid @RequestParam(value = "users", required = false) List<Long> users,
                                                                 @Valid @RequestParam(value = "states", required = false) List<String> states,
                                                                 @Valid @RequestParam(value = "categories", required = false) List<Long> categories,
@@ -93,6 +90,7 @@ public class AdminApiController implements AdminApi {
                 HttpStatus.OK);
     }
 
+    @PutMapping("/events/{eventId}")
     public ResponseEntity<EventFullDto> updateEvent(@PathVariable("eventId") Long eventId,
                                                     @Valid @RequestBody AdminUpdateEventRequest adminUpdateEventRequest) {
         return new ResponseEntity<>(modelMapper.map(adminService.updateEvent(eventId, adminUpdateEventRequest),
@@ -100,49 +98,50 @@ public class AdminApiController implements AdminApi {
                 HttpStatus.OK);
     }
 
+    @PatchMapping("/events/{eventId}/publish")
     public ResponseEntity<EventFullDto> publishEvent(@PathVariable("eventId") Long eventId) {
         return new ResponseEntity<>(modelMapper.map(adminService.publishEvent(eventId),
                 EventFullDto.class),
                 HttpStatus.OK);
     }
 
+    @PatchMapping("/events/{eventId}/reject")
     public ResponseEntity<EventFullDto> rejectEvent(@PathVariable("eventId") Long eventId) {
         return new ResponseEntity<>(modelMapper.map(adminService.rejectEvent(eventId),
                 EventFullDto.class),
                 HttpStatus.OK);
     }
 
-    public ResponseEntity<Void> removeEventFromCompilation(@Parameter(in = ParameterIn.PATH, description = "id подборки", required = true, schema = @Schema()) @PathVariable("compId") Long compId, @Parameter(in = ParameterIn.PATH, description = "id события", required = true, schema = @Schema()) @PathVariable("eventId") Long eventId) {
-        String accept = request.getHeader("Accept");
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+    @PostMapping("/compilations")
+    public ResponseEntity<CompilationDto> saveCompilation(@Valid @RequestBody NewCompilationDto newCompilationDto) {
+        return new ResponseEntity<>(modelMapper.map(adminService.saveCompilation(newCompilationDto), CompilationDto.class),
+                HttpStatus.OK);
     }
 
-    public ResponseEntity<CompilationDto> saveCompilation(@Parameter(in = ParameterIn.DEFAULT, description = "данные новой подборки", required = true, schema = @Schema()) @Valid @RequestBody NewCompilationDto body) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<CompilationDto>(objectMapper.readValue("{\n  \"pinned\" : true,\n  \"id\" : 1,\n  \"title\" : \"Летние концерты\",\n  \"events\" : [ {\n    \"annotation\" : \"Эксклюзивность нашего шоу гарантирует привлечение максимальной ", CompilationDto.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<CompilationDto>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return new ResponseEntity<CompilationDto>(HttpStatus.NOT_IMPLEMENTED);
+    @DeleteMapping("/compilations/{compId}")
+    public ResponseEntity<Void> deleteCompilation(@PathVariable("compId") Long compId) {
+        return new ResponseEntity<>(adminService.deleteCompilation(compId));
     }
 
-    public ResponseEntity<Void> pin(@Parameter(in = ParameterIn.PATH, description = "id подборки", required = true, schema = @Schema()) @PathVariable("compId") Long compId) {
-        String accept = request.getHeader("Accept");
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+    @DeleteMapping("/compilations/{compId}/events/{eventId}")
+    public ResponseEntity<Void> removeEventFromCompilation(@PathVariable("compId") Long compId,
+                                                           @PathVariable("eventId") Long eventId) {
+        return new ResponseEntity<>(adminService.removeEventFromCompilation(compId, eventId));
     }
 
-    public ResponseEntity<Void> unpin(@Parameter(in = ParameterIn.PATH, description = "id подборки", required = true, schema = @Schema()) @PathVariable("compId") Long compId) {
-        String accept = request.getHeader("Accept");
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+    @PatchMapping("/compilations/{compId}/events/{eventId}")
+    public ResponseEntity<Void> addEventToCompilation(@PathVariable("compId") Long compId,
+                                                      @PathVariable("eventId") Long eventId) {
+        return new ResponseEntity<>(adminService.addEventToCompilation(compId, eventId));
     }
 
-    public ResponseEntity<Void> deleteCompilation(@Parameter(in = ParameterIn.PATH, description = "id подборки", required = true, schema = @Schema()) @PathVariable("compId") Long compId) {
-        String accept = request.getHeader("Accept");
-        return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+    @DeleteMapping("/compilations/{compId}/pin")
+    public ResponseEntity<Void> unpinCompilation(@PathVariable("compId") Long compId) {
+        return new ResponseEntity<>(adminService.unpinCompilation(compId));
+    }
+
+    @PatchMapping("/compilations/{compId}/pin")
+    public ResponseEntity<Void> pinCompilation(@PathVariable("compId") Long compId) {
+        return new ResponseEntity<>(adminService.pinCompilation(compId));
     }
 }

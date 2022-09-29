@@ -7,6 +7,7 @@ import ru.practicum.explorewithme.model.category.Category;
 import ru.practicum.explorewithme.model.user.User;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Getter
@@ -27,11 +28,11 @@ public class Event {
 
     private Long confirmedRequests;
 
-    private String createdOn;
+    private LocalDateTime createdOn;
 
     private String description;
 
-    private String eventDate;
+    private LocalDateTime eventDate;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,7 +52,7 @@ public class Event {
 
     private Integer participantLimit;
 
-    private String publishedOn;
+    private LocalDateTime publishedOn;
 
     private Boolean requestModeration;
 
