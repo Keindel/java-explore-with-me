@@ -2,7 +2,7 @@ package ru.practicum.explorewithme.model.event;
 
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
-import ru.practicum.explorewithme.model.Location;
+import ru.practicum.explorewithme.model.location.Location;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;

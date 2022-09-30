@@ -5,66 +5,29 @@
  */
 package ru.practicum.explorewithme.api;
 
-import ru.practicum.explorewithme.model.ApiError;
-import ru.practicum.explorewithme.model.category.CategoryDto;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import ru.practicum.explorewithme.model.category.CategoryDto;
 
 import javax.validation.Valid;
 import java.util.List;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-09-19T14:46:57.997Z[GMT]")
 @Validated
 public interface CategoriesApi {
 
-    @Operation(summary = "Получение категорий", description = "", tags={ "Public: Категории" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Категории найдены", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = CategoryDto.class)))),
-        
-        @ApiResponse(responseCode = "400", description = "Запрос составлен с ошибкой", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "403", description = "Не выполнены условия для совершения операции", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "404", description = "Объект не найден", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "409", description = "Запрос приводит к нарушению целостности данных", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))) })
     @RequestMapping(value = "/categories",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<List<CategoryDto>> getCategories(@Parameter(in = ParameterIn.QUERY, description = "количество категорий, которые нужно пропустить для формирования текущего набора" ,schema=@Schema( defaultValue="0")) @Valid @RequestParam(value = "from", required = false, defaultValue="0") Integer from, @Parameter(in = ParameterIn.QUERY, description = "количество категорий в наборе" ,schema=@Schema( defaultValue="10")) @Valid @RequestParam(value = "size", required = false, defaultValue="10") Integer size);
+    ResponseEntity<List<CategoryDto>> getCategories(@Valid @RequestParam(value = "from", required = false, defaultValue="0") Integer from,
+                                                    @Valid @RequestParam(value = "size", required = false, defaultValue="10") Integer size);
 
-
-    @Operation(summary = "Получение информации о категории по её идентификатору", description = "", tags={ "Public: Категории" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Категория найдена", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CategoryDto.class))),
-        
-        @ApiResponse(responseCode = "400", description = "Запрос составлен с ошибкой", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "403", description = "Не выполнены условия для совершения операции", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "404", description = "Объект не найден", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "409", description = "Запрос приводит к нарушению целостности данных", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))) })
     @RequestMapping(value = "/categories/{catId}",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<CategoryDto> getCategory(@Parameter(in = ParameterIn.PATH, description = "id категории", required=true, schema=@Schema()) @PathVariable("catId") Long catId);
-
+    ResponseEntity<CategoryDto> getCategoryById(@PathVariable("catId") Long catId);
 }
 

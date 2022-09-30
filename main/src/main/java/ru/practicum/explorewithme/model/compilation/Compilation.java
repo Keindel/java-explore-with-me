@@ -17,9 +17,10 @@ import java.util.Objects;
 @Table(name = "compilations")
 public class Compilation {
 
-    //TODO ????
-    @ManyToMany
-    @JoinColumn(name = "compilation_id")
+    @ManyToMany(cascade = {CascadeType.ALL})
+    @JoinTable(name = "compile_events_coupling",
+            joinColumns = {@JoinColumn(name = "compilation_id")},
+            inverseJoinColumns = {@JoinColumn(name = "event_id")})
     @ToString.Exclude
     private List<Event> events;
 

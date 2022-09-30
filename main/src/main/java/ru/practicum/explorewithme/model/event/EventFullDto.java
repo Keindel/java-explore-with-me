@@ -2,7 +2,7 @@ package ru.practicum.explorewithme.model.event;
 
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
-import ru.practicum.explorewithme.model.Location;
+import ru.practicum.explorewithme.model.location.Location;
 import ru.practicum.explorewithme.model.category.CategoryDto;
 import ru.practicum.explorewithme.model.user.UserShortDto;
 

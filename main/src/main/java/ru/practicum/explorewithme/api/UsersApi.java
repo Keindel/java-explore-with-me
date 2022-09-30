@@ -5,245 +5,91 @@
  */
 package ru.practicum.explorewithme.api;
 
-import ru.practicum.explorewithme.model.ApiError;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import ru.practicum.explorewithme.model.participationrequest.ParticipationRequestDto;
 import ru.practicum.explorewithme.model.event.EventFullDto;
 import ru.practicum.explorewithme.model.event.EventShortDto;
 import ru.practicum.explorewithme.model.event.NewEventDto;
-import ru.practicum.explorewithme.model.ParticipationRequestDto;
 import ru.practicum.explorewithme.model.event.UpdateEventRequest;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-09-19T14:46:57.997Z[GMT]")
 @Validated
 public interface UsersApi {
 
-    @Operation(summary = "Добавление нового события", description = "Обратите внимание: дата и время на которые намечено событие не может быть раньше, чем через два часа от текущего момента", tags={ "Private: События" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "201", description = "Событие добавлено", content = @Content(mediaType = "application/json", schema = @Schema(implementation = EventFullDto.class))),
-        
-        @ApiResponse(responseCode = "400", description = "Запрос составлен с ошибкой", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "403", description = "Не выполнены условия для совершения операции", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "404", description = "Объект не найден", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "409", description = "Запрос приводит к нарушению целостности данных", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))) })
     @RequestMapping(value = "/users/{userId}/events",
-        produces = { "application/json" }, 
-        consumes = { "application/json" }, 
-        method = RequestMethod.POST)
-    ResponseEntity<EventFullDto> addEvent(@Parameter(in = ParameterIn.PATH, description = "id текущего пользователя", required=true, schema=@Schema()) @PathVariable("userId") Long userId, @Parameter(in = ParameterIn.DEFAULT, description = "данные добавляемого события", required=true, schema=@Schema()) @Valid @RequestBody NewEventDto body);
+            produces = {"application/json"},
+            consumes = {"application/json"},
+            method = RequestMethod.POST)
+    ResponseEntity<EventFullDto> addEvent(@PathVariable("userId") Long userId,
+                                          @Valid @RequestBody NewEventDto body);
 
-
-    @Operation(summary = "Добавление запроса от текущего пользователя на участие в событии", description = "Обратите внимание: - нельзя добавить повторный запрос - инициатор события не может добавить запрос на участие в своём событии - нельзя участвовать в неопубликованном событии - если у события достигнут лимит запросов на участие - необходимо вернуть ошибку - если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного", tags={ "Private: Запросы на участие" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "201", description = "Заявка создана", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ParticipationRequestDto.class))),
-        
-        @ApiResponse(responseCode = "400", description = "Запрос составлен с ошибкой", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "403", description = "Не выполнены условия для совершения операции", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "404", description = "Объект не найден", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "409", description = "Запрос приводит к нарушению целостности данных", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))) })
     @RequestMapping(value = "/users/{userId}/requests",
-        produces = { "application/json" }, 
-        method = RequestMethod.POST)
-    ResponseEntity<ParticipationRequestDto> addParticipationRequest(@Parameter(in = ParameterIn.PATH, description = "id текущего пользователя", required=true, schema=@Schema()) @PathVariable("userId") Long userId, @NotNull @Parameter(in = ParameterIn.QUERY, description = "id события" ,required=true,schema=@Schema()) @Valid @RequestParam(value = "eventId", required = true) Long eventId);
+            produces = {"application/json"},
+            method = RequestMethod.POST)
+    ResponseEntity<ParticipationRequestDto> addParticipationRequest(@PathVariable("userId") Long userId,
+                                                                    @NotNull @Valid @RequestParam(value = "eventId", required = true) Long eventId);
 
-
-    @Operation(summary = "Отмена события добавленного текущим пользователем.", description = "Обратите внимание: Отменить можно только событие в состоянии ожидания модерации.", tags={ "Private: События" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Событие обновлено", content = @Content(mediaType = "application/json", schema = @Schema(implementation = EventFullDto.class))),
-        
-        @ApiResponse(responseCode = "400", description = "Запрос составлен с ошибкой", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "403", description = "Не выполнены условия для совершения операции", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "404", description = "Объект не найден", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "409", description = "Запрос приводит к нарушению целостности данных", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))) })
     @RequestMapping(value = "/users/{userId}/events/{eventId}",
-        produces = { "application/json" }, 
-        method = RequestMethod.PATCH)
-    ResponseEntity<EventFullDto> cancelEvent(@Parameter(in = ParameterIn.PATH, description = "id текущего пользователя", required=true, schema=@Schema()) @PathVariable("userId") Long userId, @Parameter(in = ParameterIn.PATH, description = "id отменяемого события", required=true, schema=@Schema()) @PathVariable("eventId") Long eventId);
+            produces = {"application/json"},
+            method = RequestMethod.PATCH)
+    ResponseEntity<EventFullDto> cancelEventOfCurrentUser(@PathVariable("userId") Long userId,
+                                                          @PathVariable("eventId") Long eventId);
 
-
-    @Operation(summary = "Отклонение чужой заявки на участие в событии текущего пользователя", description = "", tags={ "Private: События" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Заявка отклонена", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ParticipationRequestDto.class))),
-        
-        @ApiResponse(responseCode = "400", description = "Запрос составлен с ошибкой", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "403", description = "Не выполнены условия для совершения операции", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "404", description = "Объект не найден", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "409", description = "Запрос приводит к нарушению целостности данных", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))) })
     @RequestMapping(value = "/users/{userId}/events/{eventId}/requests/{reqId}/reject",
-        produces = { "application/json" }, 
-        method = RequestMethod.PATCH)
-    ResponseEntity<ParticipationRequestDto> cancelParticipationRequest(@Parameter(in = ParameterIn.PATH, description = "id текущего пользователя", required=true, schema=@Schema()) @PathVariable("userId") Long userId, @Parameter(in = ParameterIn.PATH, description = "id события текущего пользователя", required=true, schema=@Schema()) @PathVariable("eventId") Long eventId, @Parameter(in = ParameterIn.PATH, description = "id заявки, которую отменяет текущий пользователь", required=true, schema=@Schema()) @PathVariable("reqId") Long reqId);
+            produces = {"application/json"},
+            method = RequestMethod.PATCH)
+    ResponseEntity<ParticipationRequestDto> rejectParticipationRequest(@PathVariable("userId") Long userId,
+                                                                       @PathVariable("eventId") Long eventId,
+                                                                       @PathVariable("reqId") Long reqId);
 
-
-    @Operation(summary = "Отмена своего запроса на участие в событии", description = "", tags={ "Private: Запросы на участие" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Заявка отменена", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ParticipationRequestDto.class))),
-        
-        @ApiResponse(responseCode = "400", description = "Запрос составлен с ошибкой", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "403", description = "Не выполнены условия для совершения операции", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "404", description = "Объект не найден", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "409", description = "Запрос приводит к нарушению целостности данных", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))) })
     @RequestMapping(value = "/users/{userId}/requests/{requestId}/cancel",
-        produces = { "application/json" }, 
-        method = RequestMethod.PATCH)
-    ResponseEntity<ParticipationRequestDto> cancelRequest(@Parameter(in = ParameterIn.PATH, description = "id текущего пользователя", required=true, schema=@Schema()) @PathVariable("userId") Long userId, @Parameter(in = ParameterIn.PATH, description = "id запроса на участие", required=true, schema=@Schema()) @PathVariable("requestId") Long requestId);
+            produces = {"application/json"},
+            method = RequestMethod.PATCH)
+    ResponseEntity<ParticipationRequestDto> cancelRequest(@PathVariable("userId") Long userId,
+                                                          @PathVariable("requestId") Long requestId);
 
-
-    @Operation(summary = "Подтверждение чужой заявки на участие в событии текущего пользователя", description = "Обратите внимание: - если для события лимит заявок равен 0 или отключена пре-модерация заявок, то подтверждение заявок не требуется - нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие - если при подтверждении данной заявки, лимит заявок для события исчерпан, то все неподтверждённые заявки необходимо отклонить", tags={ "Private: События" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Заявка подтверждена", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ParticipationRequestDto.class))),
-        
-        @ApiResponse(responseCode = "400", description = "Запрос составлен с ошибкой", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "403", description = "Не выполнены условия для совершения операции", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "404", description = "Объект не найден", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "409", description = "Запрос приводит к нарушению целостности данных", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))) })
     @RequestMapping(value = "/users/{userId}/events/{eventId}/requests/{reqId}/confirm",
-        produces = { "application/json" }, 
-        method = RequestMethod.PATCH)
-    ResponseEntity<ParticipationRequestDto> confirmParticipationRequest(@Parameter(in = ParameterIn.PATH, description = "id текущего пользователя", required=true, schema=@Schema()) @PathVariable("userId") Long userId, @Parameter(in = ParameterIn.PATH, description = "id события текущего пользователя", required=true, schema=@Schema()) @PathVariable("eventId") Long eventId, @Parameter(in = ParameterIn.PATH, description = "id заявки, которую подтверждает текущий пользователь", required=true, schema=@Schema()) @PathVariable("reqId") Long reqId);
+            produces = {"application/json"},
+            method = RequestMethod.PATCH)
+    ResponseEntity<ParticipationRequestDto> confirmParticipationRequest(@PathVariable("userId") Long userId,
+                                                                        @PathVariable("eventId") Long eventId,
+                                                                        @PathVariable("reqId") Long reqId);
 
-
-    @Operation(summary = "Получение полной информации о событии добавленном текущим пользователем", description = "", tags={ "Private: События" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Событие найдено", content = @Content(mediaType = "application/json", schema = @Schema(implementation = EventFullDto.class))),
-        
-        @ApiResponse(responseCode = "400", description = "Запрос составлен с ошибкой", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "403", description = "Не выполнены условия для совершения операции", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "404", description = "Объект не найден", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "409", description = "Запрос приводит к нарушению целостности данных", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))) })
     @RequestMapping(value = "/users/{userId}/events/{eventId}",
-        produces = { "application/json" }, 
-        method = RequestMethod.GET)
-    ResponseEntity<EventFullDto> getEvent(@Parameter(in = ParameterIn.PATH, description = "id текущего пользователя", required=true, schema=@Schema()) @PathVariable("userId") Long userId, @Parameter(in = ParameterIn.PATH, description = "id события", required=true, schema=@Schema()) @PathVariable("eventId") Long eventId);
+            produces = {"application/json"},
+            method = RequestMethod.GET)
+    ResponseEntity<EventFullDto> getEventOfCurrentUser(@PathVariable("userId") Long userId,
+                                                       @PathVariable("eventId") Long eventId);
 
-
-    @Operation(summary = "Получение информации о запросах на участие в событии текущего пользователя", description = "", tags={ "Private: События" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Найдены запросы на участие", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ParticipationRequestDto.class)))),
-        
-        @ApiResponse(responseCode = "400", description = "Запрос составлен с ошибкой", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "403", description = "Не выполнены условия для совершения операции", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "404", description = "Объект не найден", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "409", description = "Запрос приводит к нарушению целостности данных", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))) })
     @RequestMapping(value = "/users/{userId}/events/{eventId}/requests",
-        produces = { "application/json" }, 
-        method = RequestMethod.GET)
-    ResponseEntity<List<ParticipationRequestDto>> getEventParticipants(@Parameter(in = ParameterIn.PATH, description = "id текущего пользователя", required=true, schema=@Schema()) @PathVariable("userId") Long userId, @Parameter(in = ParameterIn.PATH, description = "id события", required=true, schema=@Schema()) @PathVariable("eventId") Long eventId);
+            produces = {"application/json"},
+            method = RequestMethod.GET)
+    ResponseEntity<List<ParticipationRequestDto>> getEventParticipants(@PathVariable("userId") Long userId,
+                                                                       @PathVariable("eventId") Long eventId);
 
-
-    @Operation(summary = "Получение событий, добавленных текущим пользователем", description = "", tags={ "Private: События" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "События найдены", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = EventShortDto.class)))),
-        
-        @ApiResponse(responseCode = "400", description = "Запрос составлен с ошибкой", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "403", description = "Не выполнены условия для совершения операции", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "404", description = "Объект не найден", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "409", description = "Запрос приводит к нарушению целостности данных", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))) })
     @RequestMapping(value = "/users/{userId}/events",
-        produces = { "application/json" }, 
-        method = RequestMethod.GET)
-    ResponseEntity<List<EventShortDto>> getEvents(@Parameter(in = ParameterIn.PATH, description = "id текущего пользователя", required=true, schema=@Schema()) @PathVariable("userId") Long userId, @Parameter(in = ParameterIn.QUERY, description = "количество элементов, которые нужно пропустить для формирования текущего набора" ,schema=@Schema( defaultValue="0")) @Valid @RequestParam(value = "from", required = false, defaultValue="0") Integer from, @Parameter(in = ParameterIn.QUERY, description = "количество элементов в наборе" ,schema=@Schema( defaultValue="10")) @Valid @RequestParam(value = "size", required = false, defaultValue="10") Integer size);
+            produces = {"application/json"},
+            method = RequestMethod.GET)
+    ResponseEntity<List<EventShortDto>> getEventsAddedByCurrentUser(@PathVariable("userId") Long userId,
+                                                                    @Valid @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
+                                                                    @Valid @RequestParam(value = "size", required = false, defaultValue = "10") Integer size);
 
-
-    @Operation(summary = "Получение информации о заявках текущего пользователя на участие в чужих событиях", description = "", tags={ "Private: Запросы на участие" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Найдены запросы на участие", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ParticipationRequestDto.class)))),
-        
-        @ApiResponse(responseCode = "400", description = "Запрос составлен с ошибкой", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "403", description = "Не выполнены условия для совершения операции", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "404", description = "Объект не найден", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "409", description = "Запрос приводит к нарушению целостности данных", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))) })
     @RequestMapping(value = "/users/{userId}/requests",
-        produces = { "application/json" }, 
-        method = RequestMethod.GET)
-    ResponseEntity<List<ParticipationRequestDto>> getUserRequests(@Parameter(in = ParameterIn.PATH, description = "id текущего пользователя", required=true, schema=@Schema()) @PathVariable("userId") Long userId);
+            produces = {"application/json"},
+            method = RequestMethod.GET)
+    ResponseEntity<List<ParticipationRequestDto>> getUserRequests(@PathVariable("userId") Long userId);
 
-
-    @Operation(summary = "Изменение события добавленного текущим пользователем", description = "Обратите внимание: - изменить можно только отмененные события или события в состоянии ожидания модерации - если редактируется отменённое событие, то оно автоматически переходит в состояние ожидания модерации - дата и время на которые намечено событие не может быть раньше, чем через два часа от текущего момента ", tags={ "Private: События" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Событие обновлено", content = @Content(mediaType = "application/json", schema = @Schema(implementation = EventFullDto.class))),
-        
-        @ApiResponse(responseCode = "400", description = "Запрос составлен с ошибкой", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "403", description = "Не выполнены условия для совершения операции", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "404", description = "Объект не найден", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "409", description = "Запрос приводит к нарушению целостности данных", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))) })
     @RequestMapping(value = "/users/{userId}/events",
-        produces = { "application/json" }, 
-        consumes = { "application/json" }, 
-        method = RequestMethod.PATCH)
-    ResponseEntity<EventFullDto> updateEvent1(@Parameter(in = ParameterIn.PATH, description = "id текущего пользователя", required=true, schema=@Schema()) @PathVariable("userId") Long userId, @Parameter(in = ParameterIn.DEFAULT, description = "Новые данные события", required=true, schema=@Schema()) @Valid @RequestBody UpdateEventRequest body);
+            produces = {"application/json"},
+            consumes = {"application/json"},
+            method = RequestMethod.PATCH)
+    ResponseEntity<EventFullDto> updateEventOfCurrentUser(@PathVariable("userId") Long userId,
+                                                          @Valid @RequestBody UpdateEventRequest body);
 
 }
 

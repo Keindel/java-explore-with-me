@@ -2,12 +2,14 @@ package ru.practicum.explorewithme.model.event;
 
 import lombok.*;
 import org.hibernate.Hibernate;
-import ru.practicum.explorewithme.model.Location;
+import ru.practicum.explorewithme.model.location.Location;
 import ru.practicum.explorewithme.model.category.Category;
+import ru.practicum.explorewithme.model.compilation.Compilation;
 import ru.practicum.explorewithme.model.user.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -21,7 +23,7 @@ public class Event {
 
     private String annotation;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "category_id")
     @ToString.Exclude
     private Category category;
@@ -38,12 +40,12 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     @ToString.Exclude
     private User initiator;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "location_id")
     @ToString.Exclude
     private Location location;
@@ -62,6 +64,10 @@ public class Event {
     private String title;
 
     private Long views;
+
+    @ManyToMany(mappedBy = "events")
+    @ToString.Exclude
+    private List<Compilation> compilations;
 
     @Override
     public boolean equals(Object o) {

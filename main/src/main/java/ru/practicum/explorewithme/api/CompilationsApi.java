@@ -5,66 +5,31 @@
  */
 package ru.practicum.explorewithme.api;
 
-import ru.practicum.explorewithme.model.ApiError;
-import ru.practicum.explorewithme.model.compilation.CompilationDto;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import ru.practicum.explorewithme.model.compilation.CompilationDto;
 
 import javax.validation.Valid;
 import java.util.List;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-09-19T14:46:57.997Z[GMT]")
 @Validated
 public interface CompilationsApi {
 
-    @Operation(summary = "Получение подборки событий по его id", description = "", tags={ "Public: Подборки событий" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Подборка событий найдена", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CompilationDto.class))),
-        
-        @ApiResponse(responseCode = "400", description = "Запрос составлен с ошибкой", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "403", description = "Не выполнены условия для совершения операции", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "404", description = "Объект не найден", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "409", description = "Запрос приводит к нарушению целостности данных", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))) })
     @RequestMapping(value = "/compilations/{compId}",
-        produces = { "application/json" }, 
-        method = RequestMethod.GET)
-    ResponseEntity<CompilationDto> getCompilation(@Parameter(in = ParameterIn.PATH, description = "id подборки", required=true, schema=@Schema()) @PathVariable("compId") Long compId);
+            produces = {"application/json"},
+            method = RequestMethod.GET)
+    ResponseEntity<CompilationDto> getCompilationById(@PathVariable("compId") Long compId);
 
-
-    @Operation(summary = "Получение подборок событий", description = "", tags={ "Public: Подборки событий" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Найдены подборки событий", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = CompilationDto.class)))),
-        
-        @ApiResponse(responseCode = "400", description = "Запрос составлен с ошибкой", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "403", description = "Не выполнены условия для совершения операции", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "404", description = "Объект не найден", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "409", description = "Запрос приводит к нарушению целостности данных", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))),
-        
-        @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiError.class))) })
     @RequestMapping(value = "/compilations",
-        produces = { "application/json" }, 
-        method = RequestMethod.GET)
-    ResponseEntity<List<CompilationDto>> getCompilations(@Parameter(in = ParameterIn.QUERY, description = "искать только закрепленные/не закрепленные подборки" ,schema=@Schema()) @Valid @RequestParam(value = "pinned", required = false) Boolean pinned, @Parameter(in = ParameterIn.QUERY, description = "количество элементов, которые нужно пропустить для формирования текущего набора" ,schema=@Schema( defaultValue="0")) @Valid @RequestParam(value = "from", required = false, defaultValue="0") Integer from, @Parameter(in = ParameterIn.QUERY, description = "количество элементов в наборе" ,schema=@Schema( defaultValue="10")) @Valid @RequestParam(value = "size", required = false, defaultValue="10") Integer size);
+            produces = {"application/json"},
+            method = RequestMethod.GET)
+    ResponseEntity<List<CompilationDto>> getCompilations(@Valid @RequestParam(value = "pinned", required = false) Boolean pinned,
+                                                         @Valid @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
+                                                         @Valid @RequestParam(value = "size", required = false, defaultValue = "10") Integer size);
 
 }
 

@@ -1,5 +1,9 @@
 package ru.practicum.explorewithme.api;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
+import org.springframework.web.bind.annotation.*;
 import ru.practicum.explorewithme.model.compilation.CompilationDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -9,57 +13,40 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import ru.practicum.explorewithme.service.CompilationService;
+import ru.practicum.explorewithme.service.EventService;
+import ru.practicum.explorewithme.util.ListModelMapper;
 
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-09-19T14:46:57.997Z[GMT]")
+@Slf4j
 @RestController
+@RequiredArgsConstructor
+@RequestMapping(path = "/compilations")
 public class CompilationsApiController implements CompilationsApi {
 
-    private static final Logger log = LoggerFactory.getLogger(CompilationsApiController.class);
+    private final ModelMapper modelMapper;
 
-    private final ObjectMapper objectMapper;
+    private final ListModelMapper listModelMapper;
 
-    private final HttpServletRequest request;
+    private final CompilationService compilationService;
 
-    @org.springframework.beans.factory.annotation.Autowired
-    public CompilationsApiController(ObjectMapper objectMapper, HttpServletRequest request) {
-        this.objectMapper = objectMapper;
-        this.request = request;
+    @GetMapping("/{compId}")
+    public ResponseEntity<CompilationDto> getCompilationById(@PathVariable("compId") Long compId) {
+        return new ResponseEntity<>(modelMapper.map(compilationService.getById(compId), CompilationDto.class),
+                HttpStatus.OK);
     }
 
-    public ResponseEntity<CompilationDto> getCompilation(@Parameter(in = ParameterIn.PATH, description = "id подборки", required=true, schema=@Schema()) @PathVariable("compId") Long compId) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<CompilationDto>(objectMapper.readValue("{\n  \"pinned\" : true,\n  \"id\" : 1,\n  \"title\" : \"Летние концерты\",\n  \"events\" : [ {\n    \"annotation\" : \"Эксклюзивность нашего шоу гарантирует привлечение максимальной зрительской аудитории\",\n    \"category\" : {\n      \"id\" : 1,\n      \"name\" : \"Концерты\"\n    },\n    \"confirmedRequests\" : 5,\n    \"eventDate\" : \"2024-03-10 14:30:00\",\n    \"id\" : 1,\n    \"initiator\" : {\n      \"id\" : 3,\n      \"name\" : \"Фёдоров Матвей\"\n    },\n    \"paid\" : true,\n    \"title\" : \"Знаменитое шоу 'Летающая кукуруза'\",\n    \"views\" : 999\n  }, {\n    \"annotation\" : \"За почти три десятилетия группа 'Java Core' закрепились на сцене как группа, объединяющая поколения.\",\n    \"category\" : {\n      \"id\" : 1,\n      \"name\" : \"Концерты\"\n    },\n    \"confirmedRequests\" : 555,\n    \"eventDate\" : \"2025-09-13 21:00:00\",\n    \"id\" : 1,\n    \"initiator\" : {\n      \"id\" : 3,\n      \"name\" : \"Паша Петров\"\n    },\n    \"paid\" : true,\n    \"title\" : \"Концерт рок-группы 'Java Core'\",\n    \"views\" : 991\n  } ]\n}", CompilationDto.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<CompilationDto>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return new ResponseEntity<CompilationDto>(HttpStatus.NOT_IMPLEMENTED);
+    @GetMapping
+    public ResponseEntity<List<CompilationDto>> getCompilations(@Valid @RequestParam(value = "pinned", required = false) Boolean pinned,
+                                                                @Valid @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
+                                                                @Valid @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
+        return new ResponseEntity<>(listModelMapper.mapList(compilationService
+                        .getCompilations(pinned, from, size),
+                CompilationDto.class),
+                HttpStatus.OK);
     }
-
-    public ResponseEntity<List<CompilationDto>> getCompilations(@Parameter(in = ParameterIn.QUERY, description = "искать только закрепленные/не закрепленные подборки" ,schema=@Schema()) @Valid @RequestParam(value = "pinned", required = false) Boolean pinned,@Parameter(in = ParameterIn.QUERY, description = "количество элементов, которые нужно пропустить для формирования текущего набора" ,schema=@Schema( defaultValue="0")) @Valid @RequestParam(value = "from", required = false, defaultValue="0") Integer from,@Parameter(in = ParameterIn.QUERY, description = "количество элементов в наборе" ,schema=@Schema( defaultValue="10")) @Valid @RequestParam(value = "size", required = false, defaultValue="10") Integer size) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<List<CompilationDto>>(objectMapper.readValue("[ {\n  \"pinned\" : true,\n  \"id\" : 1,\n  \"title\" : \"Летние концерты\",\n  \"events\" : [ {\n    \"annotation\" : \"Эксклюзивность нашего шоу гарантирует привлечение максимальной зрительской аудитории\",\n    \"category\" : {\n      \"id\" : 1,\n      \"name\" : \"Концерты\"\n    },\n    \"confirmedRequests\" : 5,\n    \"eventDate\" : \"2024-03-10 14:30:00\",\n    \"id\" : 1,\n    \"initiator\" : {\n      \"id\" : 3,\n      \"name\" : \"Фёдоров Матвей\"\n    },\n    \"paid\" : true,\n    \"title\" : \"Знаменитое шоу 'Летающая кукуруза'\",\n    \"views\" : 999\n  }, {\n    \"annotation\" : \"За почти три десятилетия группа 'Java Core' закрепились на сцене как группа, объединяющая поколения.\",\n    \"category\" : {\n      \"id\" : 1,\n      \"name\" : \"Концерты\"\n    },\n    \"confirmedRequests\" : 555,\n    \"eventDate\" : \"2025-09-13 21:00:00\",\n    \"id\" : 1,\n    \"initiator\" : {\n      \"id\" : 3,\n      \"name\" : \"Паша Петров\"\n    },\n    \"paid\" : true,\n    \"title\" : \"Концерт рок-группы 'Java Core'\",\n    \"views\" : 991\n  } ]\n}, {\n  \"pinned\" : true,\n  \"id\" : 1,\n  \"title\" : \"Летние концерты\",\n  \"events\" : [ {\n    \"annotation\" : \"Эксклюзивность нашего шоу гарантирует привлечение максимальной зрительской аудитории\",\n    \"category\" : {\n      \"id\" : 1,\n      \"name\" : \"Концерты\"\n    },\n    \"confirmedRequests\" : 5,\n    \"eventDate\" : \"2024-03-10 14:30:00\",\n    \"id\" : 1,\n    \"initiator\" : {\n      \"id\" : 3,\n      \"name\" : \"Фёдоров Матвей\"\n    },\n    \"paid\" : true,\n    \"title\" : \"Знаменитое шоу 'Летающая кукуруза'\",\n    \"views\" : 999\n  }, {\n    \"annotation\" : \"За почти три десятилетия группа 'Java Core' закрепились на сцене как группа, объединяющая поколения.\",\n    \"category\" : {\n      \"id\" : 1,\n      \"name\" : \"Концерты\"\n    },\n    \"confirmedRequests\" : 555,\n    \"eventDate\" : \"2025-09-13 21:00:00\",\n    \"id\" : 1,\n    \"initiator\" : {\n      \"id\" : 3,\n      \"name\" : \"Паша Петров\"\n    },\n    \"paid\" : true,\n    \"title\" : \"Концерт рок-группы 'Java Core'\",\n    \"views\" : 991\n  } ]\n} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<List<CompilationDto>>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return new ResponseEntity<List<CompilationDto>>(HttpStatus.NOT_IMPLEMENTED);
-    }
-
 }

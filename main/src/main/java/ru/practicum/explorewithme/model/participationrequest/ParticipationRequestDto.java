@@ -1,4 +1,4 @@
-package ru.practicum.explorewithme.model;
+package ru.practicum.explorewithme.model.participationrequest;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
