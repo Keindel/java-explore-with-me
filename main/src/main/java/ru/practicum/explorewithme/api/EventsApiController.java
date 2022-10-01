@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
+import ru.practicum.explorewithme.model.EndpointHit;
+import ru.practicum.explorewithme.model.ViewStats;
 import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.EventFullDto;
 import ru.practicum.explorewithme.model.event.EventShortDto;
@@ -14,6 +16,7 @@ import ru.practicum.explorewithme.service.EventService;
 import ru.practicum.explorewithme.util.ListModelMapper;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -36,10 +39,17 @@ public class EventsApiController implements EventsApi {
         Event event = eventService.getEventById(id);
 
         //TODO
+        webClient.post()
+                .uri("/hit")
+                .bodyValue(new EndpointHit(0L, "main-server", "/events/{id}", "IP", LocalDateTime.now()))
+                .retrieve();
+
+        //TODO
         Long views = webClient.get()
                 .uri("/stats?start={start}&end={end}&uris={uris}&unique={unique}")
                 .retrieve()
                 .bodyToMono(ViewStats.class)
+                .block()
                 .getHits();
 
         EventFullDto eventFullDto = modelMapper.map(eventService.getEventById(id), EventFullDto.class);
