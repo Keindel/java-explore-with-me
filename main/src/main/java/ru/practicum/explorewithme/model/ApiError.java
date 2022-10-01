@@ -1,33 +1,31 @@
 package ru.practicum.explorewithme.model;
 
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.ArrayList;
-import java.util.List;
+import lombok.*;
 import org.springframework.validation.annotation.Validated;
+
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * Сведения об ошибке
  */
-@Schema(description = "Сведения об ошибке")
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-09-19T14:46:57.997Z[GMT]")
-
-
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
+@EqualsAndHashCode
 public class ApiError   {
-  @JsonProperty("errors")
+
   @Valid
-  private List<String> errors = null;
+  private List<String> errors;
 
-  @JsonProperty("message")
-  private String message = null;
+  private String message;
 
-  @JsonProperty("reason")
-  private String reason = null;
+  private String reason;
 
   /**
    * Код статуса HTTP-ответа
@@ -191,159 +189,8 @@ public class ApiError   {
       return null;
     }
   }
-  @JsonProperty("status")
-  private StatusEnum status = null;
 
-  @JsonProperty("timestamp")
-  private String timestamp = null;
+  private StatusEnum status;
 
-  public ApiError errors(List<String> errors) {
-    this.errors = errors;
-    return this;
-  }
-
-  public ApiError addErrorsItem(String errorsItem) {
-    if (this.errors == null) {
-      this.errors = new ArrayList<String>();
-    }
-    this.errors.add(errorsItem);
-    return this;
-  }
-
-  /**
-   * Список стектрейсов или описания ошибок
-   * @return errors
-   **/
-  @Schema(example = "[]", description = "Список стектрейсов или описания ошибок")
-  
-    public List<String> getErrors() {
-    return errors;
-  }
-
-  public void setErrors(List<String> errors) {
-    this.errors = errors;
-  }
-
-  public ApiError message(String message) {
-    this.message = message;
-    return this;
-  }
-
-  /**
-   * Сообщение об ошибке
-   * @return message
-   **/
-  @Schema(example = "Only pending or canceled events can be changed", description = "Сообщение об ошибке")
-  
-    public String getMessage() {
-    return message;
-  }
-
-  public void setMessage(String message) {
-    this.message = message;
-  }
-
-  public ApiError reason(String reason) {
-    this.reason = reason;
-    return this;
-  }
-
-  /**
-   * Общее описание причины ошибки
-   * @return reason
-   **/
-  @Schema(example = "For the requested operation the conditions are not met.", description = "Общее описание причины ошибки")
-  
-    public String getReason() {
-    return reason;
-  }
-
-  public void setReason(String reason) {
-    this.reason = reason;
-  }
-
-  public ApiError status(StatusEnum status) {
-    this.status = status;
-    return this;
-  }
-
-  /**
-   * Код статуса HTTP-ответа
-   * @return status
-   **/
-  @Schema(example = "FORBIDDEN", description = "Код статуса HTTP-ответа")
-  
-    public StatusEnum getStatus() {
-    return status;
-  }
-
-  public void setStatus(StatusEnum status) {
-    this.status = status;
-  }
-
-  public ApiError timestamp(String timestamp) {
-    this.timestamp = timestamp;
-    return this;
-  }
-
-  /**
-   * Дата и время когда произошла ошибка (в формате \"yyyy-MM-dd HH:mm:ss\")
-   * @return timestamp
-   **/
-  @Schema(example = "2022-06-09 06:27:23", description = "Дата и время когда произошла ошибка (в формате \"yyyy-MM-dd HH:mm:ss\")")
-  
-    public String getTimestamp() {
-    return timestamp;
-  }
-
-  public void setTimestamp(String timestamp) {
-    this.timestamp = timestamp;
-  }
-
-
-  @Override
-  public boolean equals(java.lang.Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    ApiError apiError = (ApiError) o;
-    return Objects.equals(this.errors, apiError.errors) &&
-        Objects.equals(this.message, apiError.message) &&
-        Objects.equals(this.reason, apiError.reason) &&
-        Objects.equals(this.status, apiError.status) &&
-        Objects.equals(this.timestamp, apiError.timestamp);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hash(errors, message, reason, status, timestamp);
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("class ApiError {\n");
-    
-    sb.append("    errors: ").append(toIndentedString(errors)).append("\n");
-    sb.append("    message: ").append(toIndentedString(message)).append("\n");
-    sb.append("    reason: ").append(toIndentedString(reason)).append("\n");
-    sb.append("    status: ").append(toIndentedString(status)).append("\n");
-    sb.append("    timestamp: ").append(toIndentedString(timestamp)).append("\n");
-    sb.append("}");
-    return sb.toString();
-  }
-
-  /**
-   * Convert the given object to string with each line indented by 4 spaces
-   * (except the first line).
-   */
-  private String toIndentedString(java.lang.Object o) {
-    if (o == null) {
-      return "null";
-    }
-    return o.toString().replace("\n", "\n    ");
-  }
+  private String timestamp;
 }
