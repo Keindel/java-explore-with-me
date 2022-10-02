@@ -34,7 +34,8 @@ public class ParticipationRequest {
     @ToString.Exclude
     private User requester;
 
-    private String status;
+    @Enumerated(value = EnumType.STRING)
+    private Status status;
 
     @Override
     public boolean equals(Object o) {

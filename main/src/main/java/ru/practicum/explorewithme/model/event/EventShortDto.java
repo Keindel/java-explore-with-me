@@ -1,5 +1,6 @@
 package ru.practicum.explorewithme.model.event;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,22 +24,22 @@ import javax.validation.constraints.*;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class EventShortDto   {
 
-  private String annotation = null;
+  private String annotation;
 
-  private CategoryDto category = null;
+  private CategoryDto category;
 
-  private Long confirmedRequests = null;
+  private Long confirmedRequests;
 
-  private String eventDate = null;
+  private LocalDateTime eventDate;
 
   @EqualsAndHashCode.Include
-  private Long id = null;
+  private Long id;
 
-  private UserShortDto initiator = null;
+  private UserShortDto initiator;
 
-  private Boolean paid = null;
+  private Boolean paid;
 
-  private String title = null;
+  private String title;
 
-  private Long views = null;
+  private Long views;
 }

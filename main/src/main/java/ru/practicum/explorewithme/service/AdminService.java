@@ -1,6 +1,7 @@
 package ru.practicum.explorewithme.service;
 
 import org.springframework.http.HttpStatus;
+import ru.practicum.explorewithme.exceptions.EventNotFoundException;
 import ru.practicum.explorewithme.model.AdminUpdateEventRequest;
 import ru.practicum.explorewithme.model.category.Category;
 import ru.practicum.explorewithme.model.category.CategoryDto;
@@ -34,7 +35,7 @@ public interface AdminService {
 
     Event rejectEvent(Long eventId);
 
-    Compilation saveCompilation(NewCompilationDto newCompilationDto);
+    Compilation saveCompilation(NewCompilationDto newCompilationDto) throws EventNotFoundException;
 
     HttpStatus deleteCompilation(Long compId);
 

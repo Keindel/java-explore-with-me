@@ -4,9 +4,11 @@ import lombok.*;
 import org.springframework.validation.annotation.Validated;
 import ru.practicum.explorewithme.model.location.Location;
 
+import javax.validation.constraints.Future;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 /**
  * Новое событие
@@ -30,8 +32,8 @@ public class NewEventDto   {
   @NotBlank
   private String description;
 
-  @NotBlank
-  private String eventDate;
+  @Future
+  private LocalDateTime eventDate;
 
   @NotNull
   private Location location;

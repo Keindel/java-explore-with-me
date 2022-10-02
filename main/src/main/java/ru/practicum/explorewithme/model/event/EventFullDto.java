@@ -1,10 +1,13 @@
 package ru.practicum.explorewithme.model.event;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 import ru.practicum.explorewithme.model.location.Location;
 import ru.practicum.explorewithme.model.category.CategoryDto;
 import ru.practicum.explorewithme.model.user.UserShortDto;
+
+import java.time.LocalDateTime;
 
 /**
  * EventFullDto
@@ -24,11 +27,11 @@ public class EventFullDto   {
 
   private Long confirmedRequests;
 
-  private String createdOn;
+  private LocalDateTime createdOn;
 
   private String description;
 
-  private String eventDate;
+  private LocalDateTime eventDate;
 
   @EqualsAndHashCode.Include
   private Long id;
@@ -41,7 +44,7 @@ public class EventFullDto   {
 
   private Integer participantLimit;
 
-  private String publishedOn;
+  private LocalDateTime publishedOn;
 
   private Boolean requestModeration;
 

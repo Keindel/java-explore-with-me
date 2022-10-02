@@ -1,4 +1,4 @@
-package ru.practicum.explorewithme.model;
+package ru.practicum.explorewithme.exceptions;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -6,6 +6,7 @@ import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -20,8 +21,7 @@ import java.util.List;
 @EqualsAndHashCode
 public class ApiError   {
 
-  @Valid
-  private List<String> errors;
+  private StackTraceElement[] errors;
 
   private String message;
 
@@ -192,5 +192,5 @@ public class ApiError   {
 
   private StatusEnum status;
 
-  private String timestamp;
+  private LocalDateTime timestamp;
 }

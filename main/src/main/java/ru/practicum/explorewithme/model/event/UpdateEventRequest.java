@@ -1,5 +1,6 @@
 package ru.practicum.explorewithme.model.event;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,7 +27,7 @@ public class UpdateEventRequest   {
 
   private String description;
 
-  private String eventDate;
+  private LocalDateTime eventDate;
 
   private Long eventId;
 

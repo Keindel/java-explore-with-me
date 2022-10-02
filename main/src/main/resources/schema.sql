@@ -1,23 +1,21 @@
 CREATE TABLE IF NOT EXISTS categories
 (
     id   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
-    name VARCHAR(32)                                     NOT NULL UNIQUE
+    name VARCHAR(32) UNIQUE                              NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS locations
 (
-    id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
-    lat    DECIMAL(9, 6)                                   NOT NULL,
-    lon    DECIMAL(9, 6)                                   NOT NULL,
-    name   VARCHAR(32),
-    radius INT
+    id  BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
+    lat DECIMAL(9, 6)                                   NOT NULL,
+    lon DECIMAL(9, 6)                                   NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS users
 (
     id    BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
     name  VARCHAR(64)                                     NOT NULL,
-    email VARCHAR(64)                                     NOT NULL
+    email VARCHAR(64) UNIQUE                              NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS compilations
@@ -52,7 +50,9 @@ CREATE TABLE IF NOT EXISTS participation_requests
     created      TIMESTAMP                                       NOT NULL,
     event_id     BIGINT REFERENCES events (id) ON DELETE CASCADE NOT NULL,
     requester_id BIGINT REFERENCES users (id) ON DELETE CASCADE  NOT NULL,
-    status       VARCHAR(32)                                     NOT NULL
+    status       VARCHAR(32)                                     NOT NULL,
+
+    CONSTRAINT UNIQUE (event_id, requester_id)
 );
 
 
@@ -62,4 +62,13 @@ CREATE TABLE IF NOT EXISTS compile_events_coupling
     compilation_id BIGINT REFERENCES compilations (id) ON DELETE CASCADE NOT NULL,
 
     PRIMARY KEY (event_id, compilation_id)
+);
+
+CREATE TABLE IF NOT EXISTS location_areas
+(
+    id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
+    lat    DECIMAL(9, 6)                                   NOT NULL,
+    lon    DECIMAL(9, 6)                                   NOT NULL,
+    name   VARCHAR(64),
+    radius INT
 );
