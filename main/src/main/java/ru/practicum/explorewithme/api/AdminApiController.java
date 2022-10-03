@@ -3,27 +3,25 @@ package ru.practicum.explorewithme.api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
 import ru.practicum.explorewithme.model.AdminUpdateEventRequest;
 import ru.practicum.explorewithme.model.category.CategoryDto;
 import ru.practicum.explorewithme.model.compilation.CompilationDto;
 import ru.practicum.explorewithme.model.event.EventFullDto;
 import ru.practicum.explorewithme.model.category.NewCategoryDto;
 import ru.practicum.explorewithme.model.compilation.NewCompilationDto;
+import ru.practicum.explorewithme.model.event.State;
 import ru.practicum.explorewithme.model.user.NewUserRequest;
 import ru.practicum.explorewithme.model.user.UserDto;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import ru.practicum.explorewithme.service.AdminService;
-import ru.practicum.explorewithme.util.ListModelMapper;
+import ru.practicum.explorewithme.mapper.ListModelMapper;
 
 import javax.validation.Valid;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -78,10 +76,12 @@ public class AdminApiController implements AdminApi {
 
     @GetMapping("/events")
     public ResponseEntity<List<EventFullDto>> getEventsDetailed(@Valid @RequestParam(value = "users", required = false) List<Long> users,
-                                                                @Valid @RequestParam(value = "states", required = false) List<String> states,
+                                                                @Valid @RequestParam(value = "states", required = false) List<State> states,
                                                                 @Valid @RequestParam(value = "categories", required = false) List<Long> categories,
-                                                                @Valid @RequestParam(value = "rangeStart", required = false) String rangeStart,
-                                                                @Valid @RequestParam(value = "rangeEnd", required = false) String rangeEnd,
+                                                                @Valid @RequestParam(value = "rangeStart", required = false)
+                                                                    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
+                                                                @Valid @RequestParam(value = "rangeEnd", required = false)
+                                                                    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
                                                                 @Valid @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
                                                                 @Valid @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
         return new ResponseEntity<>(listModelMapper.mapList(adminService.
@@ -113,8 +113,9 @@ public class AdminApiController implements AdminApi {
     }
 
     @PostMapping("/compilations")
-    public ResponseEntity<CompilationDto> saveCompilation(@Valid @RequestBody NewCompilationDto newCompilationDto) {
-        return new ResponseEntity<>(modelMapper.map(adminService.saveCompilation(newCompilationDto), CompilationDto.class),
+    public ResponseEntity<CompilationDto> saveCompilation(@Valid @RequestBody NewCompilationDto newCompilationDto) throws EventNotFoundException {
+        return new ResponseEntity<>(modelMapper.map(adminService.saveCompilation(newCompilationDto),
+                CompilationDto.class),
                 HttpStatus.OK);
     }
 

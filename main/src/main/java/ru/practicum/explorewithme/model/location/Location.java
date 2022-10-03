@@ -32,10 +32,6 @@ public class Location   {
   @NotNull
   private BigDecimal lon;
 
-  private String name;
-
-  private Integer radius;
-
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;

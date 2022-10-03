@@ -5,21 +5,19 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.practicum.explorewithme.exceptions.EventNotFoundException;
+import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
 import ru.practicum.explorewithme.exceptions.EventTimeException;
 import ru.practicum.explorewithme.exceptions.RequestLogicException;
-import ru.practicum.explorewithme.exceptions.UserNotFoundException;
+import ru.practicum.explorewithme.exceptions.notfound.UserNotFoundException;
 import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.NewEventDto;
+import ru.practicum.explorewithme.model.event.State;
 import ru.practicum.explorewithme.model.event.UpdateEventRequest;
 import ru.practicum.explorewithme.model.location.Location;
 import ru.practicum.explorewithme.model.participationrequest.ParticipationRequest;
 import ru.practicum.explorewithme.model.participationrequest.Status;
 import ru.practicum.explorewithme.model.user.User;
-import ru.practicum.explorewithme.repository.EventRepository;
-import ru.practicum.explorewithme.repository.LocationRepository;
-import ru.practicum.explorewithme.repository.ParticipationRequestRepository;
-import ru.practicum.explorewithme.repository.UserRepository;
+import ru.practicum.explorewithme.repository.*;
 import ru.practicum.explorewithme.util.CustomPageable;
 
 import java.time.LocalDateTime;
@@ -36,6 +34,8 @@ public class UserServiceImpl implements UserService {
     private final EventRepository eventRepository;
 
     private final LocationRepository locationRepository;
+
+    private final CategoryRepository categoryRepository;
 
     private final ParticipationRequestRepository participationRequestRepository;
 
@@ -56,9 +56,13 @@ public class UserServiceImpl implements UserService {
             throw new EventTimeException("Only pending or canceled events can be changed");
         }
         Event event = modelMapper.map(newEventDto, Event.class);
-        Location location = locationRepository.save(newEventDto.getLocation());
 
+        Location location = locationRepository.save(newEventDto.getLocation());
         event.setLocation(location);
+
+        event.setCategory(categoryRepository.findById(newEventDto.getCategory()).get());
+        event.setState(State.PENDING);
+
         event.setCreatedOn(LocalDateTime.now());
         event.setInitiator(userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(String.format("User with id=%d was not found.", userId))));
@@ -105,9 +109,9 @@ public class UserServiceImpl implements UserService {
         if (event.getPublishedOn() == null) {
             throw new RequestLogicException("Cant request not published event");
         }
-        if (event.getConfirmedRequests() >= event.getParticipantLimit()) {
-            throw new RequestLogicException("Requests limit is reached");
-        }
+//        if (event.getConfirmedRequests() >= event.getParticipantLimit()) {
+//            throw new RequestLogicException("Requests limit is reached");
+//        }
         Status status = Status.PENDING;
         if (Boolean.FALSE.equals(event.getRequestModeration())) {
             status = Status.CONFIRMED;

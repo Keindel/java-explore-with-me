@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import ru.practicum.explorewithme.exceptions.notfound.CategoryNotFoundException;
 import ru.practicum.explorewithme.model.category.CategoryDto;
 
 import javax.validation.Valid;
@@ -28,6 +29,6 @@ public interface CategoriesApi {
     @RequestMapping(value = "/categories/{catId}",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    ResponseEntity<CategoryDto> getCategoryById(@PathVariable("catId") Long catId);
+    ResponseEntity<CategoryDto> getCategoryById(@PathVariable("catId") Long catId) throws CategoryNotFoundException;
 }
 

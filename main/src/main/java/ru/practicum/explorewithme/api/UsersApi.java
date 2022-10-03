@@ -8,6 +8,10 @@ package ru.practicum.explorewithme.api;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
+import ru.practicum.explorewithme.exceptions.EventTimeException;
+import ru.practicum.explorewithme.exceptions.RequestLogicException;
+import ru.practicum.explorewithme.exceptions.notfound.UserNotFoundException;
 import ru.practicum.explorewithme.model.participationrequest.ParticipationRequestDto;
 import ru.practicum.explorewithme.model.event.EventFullDto;
 import ru.practicum.explorewithme.model.event.EventShortDto;
@@ -26,13 +30,13 @@ public interface UsersApi {
             consumes = {"application/json"},
             method = RequestMethod.POST)
     ResponseEntity<EventFullDto> addEvent(@PathVariable("userId") Long userId,
-                                          @Valid @RequestBody NewEventDto body);
+                                          @Valid @RequestBody NewEventDto body) throws EventTimeException, UserNotFoundException;
 
     @RequestMapping(value = "/users/{userId}/requests",
             produces = {"application/json"},
             method = RequestMethod.POST)
     ResponseEntity<ParticipationRequestDto> addParticipationRequest(@PathVariable("userId") Long userId,
-                                                                    @NotNull @Valid @RequestParam(value = "eventId", required = true) Long eventId);
+                                                                    @NotNull @Valid @RequestParam(value = "eventId", required = true) Long eventId) throws UserNotFoundException, RequestLogicException, EventNotFoundException;
 
     @RequestMapping(value = "/users/{userId}/events/{eventId}",
             produces = {"application/json"},

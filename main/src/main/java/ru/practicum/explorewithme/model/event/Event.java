@@ -18,7 +18,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @ToString
 @Entity
-@Table(name = "users")
+@Table(name = "events")
 public class Event {
 
     private String annotation;
@@ -27,8 +27,6 @@ public class Event {
     @JoinColumn(name = "category_id")
     @ToString.Exclude
     private Category category;
-
-    private Long confirmedRequests;
 
     private LocalDateTime createdOn;
 
@@ -41,7 +39,7 @@ public class Event {
     private Long id;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "initiator_id")
     @ToString.Exclude
     private User initiator;
 
@@ -52,18 +50,19 @@ public class Event {
 
     private Boolean paid;
 
+    @Column(name = "participant_limit")
     private Integer participantLimit;
 
+    @Column(name = "published_on")
     private LocalDateTime publishedOn;
 
+    @Column(name = "request_moderation")
     private Boolean requestModeration;
 
     @Enumerated(EnumType.STRING)
     private State state;
 
     private String title;
-
-    private Long views;
 
     @ManyToMany(mappedBy = "events")
     @ToString.Exclude

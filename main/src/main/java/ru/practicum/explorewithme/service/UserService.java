@@ -1,9 +1,9 @@
 package ru.practicum.explorewithme.service;
 
-import ru.practicum.explorewithme.exceptions.EventNotFoundException;
+import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
 import ru.practicum.explorewithme.exceptions.EventTimeException;
 import ru.practicum.explorewithme.exceptions.RequestLogicException;
-import ru.practicum.explorewithme.exceptions.UserNotFoundException;
+import ru.practicum.explorewithme.exceptions.notfound.UserNotFoundException;
 import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.NewEventDto;
 import ru.practicum.explorewithme.model.event.UpdateEventRequest;

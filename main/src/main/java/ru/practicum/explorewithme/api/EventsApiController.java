@@ -13,7 +13,7 @@ import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.EventFullDto;
 import ru.practicum.explorewithme.model.event.EventShortDto;
 import ru.practicum.explorewithme.service.EventService;
-import ru.practicum.explorewithme.util.ListModelMapper;
+import ru.practicum.explorewithme.mapper.ListModelMapper;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;

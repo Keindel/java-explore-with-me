@@ -5,12 +5,14 @@
  */
 package ru.practicum.explorewithme.api;
 
+import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
 import ru.practicum.explorewithme.model.AdminUpdateEventRequest;
 import ru.practicum.explorewithme.model.category.CategoryDto;
 import ru.practicum.explorewithme.model.compilation.CompilationDto;
 import ru.practicum.explorewithme.model.event.EventFullDto;
 import ru.practicum.explorewithme.model.category.NewCategoryDto;
 import ru.practicum.explorewithme.model.compilation.NewCompilationDto;
+import ru.practicum.explorewithme.model.event.State;
 import ru.practicum.explorewithme.model.user.NewUserRequest;
 import ru.practicum.explorewithme.model.user.UserDto;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Validated
@@ -66,10 +69,10 @@ public interface AdminApi {
             produces = { "application/json" },
             method = RequestMethod.GET)
     ResponseEntity<List<EventFullDto>> getEventsDetailed(@Valid @RequestParam(value = "users", required = false) List<Long> users,
-                                                         @Valid @RequestParam(value = "states", required = false) List<String> states,
+                                                         @Valid @RequestParam(value = "states", required = false) List<State> states,
                                                          @Valid @RequestParam(value = "categories", required = false) List<Long> categories,
-                                                         @Valid @RequestParam(value = "rangeStart", required = false) String rangeStart,
-                                                         @Valid @RequestParam(value = "rangeEnd", required = false) String rangeEnd,
+                                                         @Valid @RequestParam(value = "rangeStart", required = false) LocalDateTime rangeStart,
+                                                         @Valid @RequestParam(value = "rangeEnd", required = false) LocalDateTime rangeEnd,
                                                          @Valid @RequestParam(value = "from", required = false, defaultValue="0") Integer from,
                                                          @Valid @RequestParam(value = "size", required = false, defaultValue="10") Integer size);
 
@@ -94,7 +97,7 @@ public interface AdminApi {
             produces = { "application/json" },
             consumes = { "application/json" },
             method = RequestMethod.POST)
-    ResponseEntity<CompilationDto> saveCompilation(@Valid @RequestBody NewCompilationDto body);
+    ResponseEntity<CompilationDto> saveCompilation(@Valid @RequestBody NewCompilationDto body) throws EventNotFoundException;
 
     @RequestMapping(value = "/admin/compilations/{compId}",
             produces = { "application/json" },

@@ -1,5 +1,6 @@
 package ru.practicum.explorewithme.model.event;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 import ru.practicum.explorewithme.model.location.Location;
@@ -33,6 +34,7 @@ public class NewEventDto   {
   private String description;
 
   @Future
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private LocalDateTime eventDate;
 
   @NotNull

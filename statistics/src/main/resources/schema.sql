@@ -5,4 +5,4 @@ CREATE TABLE IF NOT EXISTS endpoint_hit
     uri       VARCHAR(256)                                    NOT NULL,
     ip        VARCHAR(64),
     timestamp TIMESTAMP                                       NOT NULL
-)
+);

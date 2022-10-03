@@ -1,3 +1,13 @@
+DROP TABLE IF EXISTS endpoint_hit,
+    location_areas,
+    compile_events_coupling,
+    participation_requests,
+    events,
+    compilations,
+    users,
+    locations,
+    categories;
+
 CREATE TABLE IF NOT EXISTS categories
 (
     id   BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
@@ -30,7 +40,6 @@ CREATE TABLE IF NOT EXISTS events
     id                 BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
     annotation         VARCHAR(64)                                     NOT NULL,
     category_id        INT REFERENCES categories (id) ON DELETE NO ACTION,
-    confirmed_requests INT,
     created_on         TIMESTAMP                                       NOT NULL,
     description        VARCHAR(512)                                    NOT NULL,
     event_date         TIMESTAMP                                       NOT NULL,
@@ -38,7 +47,7 @@ CREATE TABLE IF NOT EXISTS events
     location_id        BIGINT REFERENCES locations (id) ON DELETE NO ACTION,
     paid               BOOLEAN                                         NOT NULL,
     participant_limit  INT,
-    published_on       TIMESTAMP                                       NOT NULL,
+    published_on       TIMESTAMP,
     request_moderation BOOLEAN                                         NOT NULL,
     state              VARCHAR(64)                                     NOT NULL,
     title              VARCHAR(128)                                    NOT NULL
@@ -52,7 +61,7 @@ CREATE TABLE IF NOT EXISTS participation_requests
     requester_id BIGINT REFERENCES users (id) ON DELETE CASCADE  NOT NULL,
     status       VARCHAR(32)                                     NOT NULL,
 
-    CONSTRAINT UNIQUE (event_id, requester_id)
+    CONSTRAINT forbid_duplicate_requests UNIQUE (event_id, requester_id)
 );
 
 
