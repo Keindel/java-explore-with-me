@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
                 && newParticipantLimit < participationRequestRepository.findAllByStatusAndEvent(Status.CONFIRMED, event).size()) {
             throw new RequestLogicException("new request limit can't be less than current number of confirmed requests");
         }
-        Event eventUpdate = eventMapper.mapToEvent(updateEventRequest);
+        Event eventUpdate = eventMapper.mapToEvent(updateEventRequest, updateEventRequest.getEventId());
         eventUpdate.setState(State.PENDING);
         return eventRepository.save(eventUpdate);
     }
@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
         if (newEventDto.getEventDate().minusHours(2).isBefore(LocalDateTime.now())) {
             throw new EventTimeException("Only pending or canceled events can be changed");
         }
-        Event event = eventMapper.mapToEvent(newEventDto);
+        Event event = eventMapper.mapToEvent(newEventDto, null);
         Location location = locationRepository.save(newEventDto.getLocation());
 
         event.setLocation(location);

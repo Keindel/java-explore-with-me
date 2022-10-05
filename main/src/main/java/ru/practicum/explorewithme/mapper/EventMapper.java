@@ -24,9 +24,13 @@ public class EventMapper {
 //        return modelMapper.map(event, EventFullDto.class);
 //    }
 
-    public <T> Event mapToEvent(T eventSomeDto) {
+    public <T> Event mapToEvent(T eventSomeDto, Long id) {
         modelMapper.typeMap(NewEventDto.class, Event.class).addMappings(m
                 -> m.using(convertLongToCat).map(NewEventDto::getCategory, Event::setCategory));
+        Event event = modelMapper.map(eventSomeDto, Event.class);
+        if (id != null) {
+            event.setId(id);
+        }
         return modelMapper.map(eventSomeDto, Event.class);
     }
 

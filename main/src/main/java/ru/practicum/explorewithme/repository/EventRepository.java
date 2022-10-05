@@ -15,6 +15,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     Page<Event> findAllByInitiatorId(Long userId, Pageable pageable);
 
+    //TODO JPA Criteria API
     @Query("SELECT ev FROM Event ev " +
             "WHERE (:users IS NULL OR ev.initiator.id IN :users) " +
             "AND (:states IS NULL OR ev.state IN :states)" +
@@ -44,7 +45,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     String confirmedRequestsCount = "(SELECT COUNT(part_req) FROM ParticipationRequest part_req " +
             "WHERE part_req.event = ev AND part_req.status = 'CONFIRMED')";
 
-    //TODO
+    //TODO JPA Criteria API
     @Query("SELECT ev FROM Event ev " +
             "WHERE (LOWER(ev.annotation) LIKE LOWER(CONCAT('%', :text, '%') ) " +
             "OR LOWER(ev.description) LIKE LOWER(concat('%', :text, '%') )) " +

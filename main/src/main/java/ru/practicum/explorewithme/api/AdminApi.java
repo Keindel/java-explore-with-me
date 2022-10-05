@@ -5,6 +5,7 @@
  */
 package ru.practicum.explorewithme.api;
 
+import ru.practicum.explorewithme.exceptions.EventTimeException;
 import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
 import ru.practicum.explorewithme.model.AdminUpdateEventRequest;
 import ru.practicum.explorewithme.model.category.CategoryDto;
@@ -74,7 +75,7 @@ public interface AdminApi {
                                                          @Valid @RequestParam(value = "rangeStart", required = false) LocalDateTime rangeStart,
                                                          @Valid @RequestParam(value = "rangeEnd", required = false) LocalDateTime rangeEnd,
                                                          @Valid @RequestParam(value = "from", required = false, defaultValue="0") Integer from,
-                                                         @Valid @RequestParam(value = "size", required = false, defaultValue="10") Integer size);
+                                                         @Valid @RequestParam(value = "size", required = false, defaultValue="10") Integer size) throws EventTimeException;
 
     @RequestMapping(value = "/admin/events/{eventId}",
             produces = { "application/json" },

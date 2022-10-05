@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.explorewithme.exceptions.EventTimeException;
 import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
 import ru.practicum.explorewithme.model.AdminUpdateEventRequest;
 import ru.practicum.explorewithme.model.category.CategoryDto;
@@ -83,7 +84,8 @@ public class AdminApiController implements AdminApi {
                                                                 @Valid @RequestParam(value = "rangeEnd", required = false)
                                                                     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
                                                                 @Valid @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
-                                                                @Valid @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
+                                                                @Valid @RequestParam(value = "size", required = false, defaultValue = "10") Integer size)
+            throws EventTimeException {
         return new ResponseEntity<>(listModelMapper.mapList(adminService.
                         getEventsDetailed(users, states, categories, rangeStart, rangeEnd, from, size),
                 EventFullDto.class),
@@ -113,7 +115,8 @@ public class AdminApiController implements AdminApi {
     }
 
     @PostMapping("/compilations")
-    public ResponseEntity<CompilationDto> saveCompilation(@Valid @RequestBody NewCompilationDto newCompilationDto) throws EventNotFoundException {
+    public ResponseEntity<CompilationDto> saveCompilation(@Valid @RequestBody NewCompilationDto newCompilationDto)
+            throws EventNotFoundException {
         return new ResponseEntity<>(modelMapper.map(adminService.saveCompilation(newCompilationDto),
                 CompilationDto.class),
                 HttpStatus.OK);

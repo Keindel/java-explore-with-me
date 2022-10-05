@@ -2,6 +2,9 @@ package ru.practicum.explorewithme.service;
 
 import org.springframework.http.HttpStatus;
 import ru.practicum.explorewithme.exceptions.EventTimeException;
+import ru.practicum.explorewithme.exceptions.ForbiddenException;
+import ru.practicum.explorewithme.exceptions.RequestLogicException;
+import ru.practicum.explorewithme.exceptions.notfound.CompilationNotFoundException;
 import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
 import ru.practicum.explorewithme.model.AdminUpdateEventRequest;
 import ru.practicum.explorewithme.model.category.Category;
@@ -36,21 +39,21 @@ public interface AdminService {
                                   LocalDateTime rangeStart, LocalDateTime rangeEnd,
                                   Integer from, Integer size) throws EventTimeException;
 
-    Event updateEvent(Long eventId, AdminUpdateEventRequest adminUpdateEventRequest);
+    Event updateEvent(Long eventId, AdminUpdateEventRequest adminUpdateEventRequest) throws EventNotFoundException, RequestLogicException;
 
-    Event publishEvent(Long eventId);
+    Event publishEvent(Long eventId) throws EventNotFoundException, ForbiddenException, EventTimeException;
 
-    Event rejectEvent(Long eventId);
+    Event rejectEvent(Long eventId) throws ForbiddenException, EventNotFoundException;
 
     Compilation saveCompilation(NewCompilationDto newCompilationDto) throws EventNotFoundException;
 
     HttpStatus deleteCompilation(Long compId);
 
-    HttpStatus removeEventFromCompilation(Long compId, Long eventId);
+    HttpStatus removeEventFromCompilation(Long compId, Long eventId) throws EventNotFoundException, CompilationNotFoundException;
 
-    HttpStatus addEventToCompilation(Long compId, Long eventId);
+    HttpStatus addEventToCompilation(Long compId, Long eventId) throws EventNotFoundException, CompilationNotFoundException;
 
-    HttpStatus unpinCompilation(Long compId);
+    HttpStatus unpinCompilation(Long compId) throws CompilationNotFoundException;
 
-    HttpStatus pinCompilation(Long compId);
+    HttpStatus pinCompilation(Long compId) throws CompilationNotFoundException;
 }
