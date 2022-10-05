@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import ru.practicum.explorewithme.exceptions.notfound.CompilationNotFoundException;
 import ru.practicum.explorewithme.model.compilation.CompilationDto;
 
 import javax.validation.Valid;
@@ -22,7 +23,7 @@ public interface CompilationsApi {
     @RequestMapping(value = "/compilations/{compId}",
             produces = {"application/json"},
             method = RequestMethod.GET)
-    ResponseEntity<CompilationDto> getCompilationById(@PathVariable("compId") Long compId);
+    ResponseEntity<CompilationDto> getCompilationById(@PathVariable("compId") Long compId) throws CompilationNotFoundException;
 
     @RequestMapping(value = "/compilations",
             produces = {"application/json"},

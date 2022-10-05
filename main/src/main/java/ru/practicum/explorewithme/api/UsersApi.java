@@ -8,9 +8,12 @@ package ru.practicum.explorewithme.api;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.explorewithme.exceptions.ForbiddenException;
+import ru.practicum.explorewithme.exceptions.notfound.CategoryNotFoundException;
 import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
 import ru.practicum.explorewithme.exceptions.EventTimeException;
 import ru.practicum.explorewithme.exceptions.RequestLogicException;
+import ru.practicum.explorewithme.exceptions.notfound.ParticipationRequestNotFoundException;
 import ru.practicum.explorewithme.exceptions.notfound.UserNotFoundException;
 import ru.practicum.explorewithme.model.participationrequest.ParticipationRequestDto;
 import ru.practicum.explorewithme.model.event.EventFullDto;
@@ -30,51 +33,59 @@ public interface UsersApi {
             consumes = {"application/json"},
             method = RequestMethod.POST)
     ResponseEntity<EventFullDto> addEvent(@PathVariable("userId") Long userId,
-                                          @Valid @RequestBody NewEventDto body) throws EventTimeException, UserNotFoundException;
+                                          @Valid @RequestBody NewEventDto body)
+            throws EventTimeException, UserNotFoundException, CategoryNotFoundException;
 
     @RequestMapping(value = "/users/{userId}/requests",
             produces = {"application/json"},
             method = RequestMethod.POST)
     ResponseEntity<ParticipationRequestDto> addParticipationRequest(@PathVariable("userId") Long userId,
-                                                                    @NotNull @Valid @RequestParam(value = "eventId", required = true) Long eventId) throws UserNotFoundException, RequestLogicException, EventNotFoundException;
+                                                                    @NotNull @Valid @RequestParam(value = "eventId") Long eventId)
+            throws UserNotFoundException, RequestLogicException, EventNotFoundException;
 
     @RequestMapping(value = "/users/{userId}/events/{eventId}",
             produces = {"application/json"},
             method = RequestMethod.PATCH)
     ResponseEntity<EventFullDto> cancelEventOfCurrentUser(@PathVariable("userId") Long userId,
-                                                          @PathVariable("eventId") Long eventId);
+                                                          @PathVariable("eventId") Long eventId)
+            throws UserNotFoundException, ForbiddenException, EventNotFoundException;
 
     @RequestMapping(value = "/users/{userId}/events/{eventId}/requests/{reqId}/reject",
             produces = {"application/json"},
             method = RequestMethod.PATCH)
     ResponseEntity<ParticipationRequestDto> rejectParticipationRequest(@PathVariable("userId") Long userId,
                                                                        @PathVariable("eventId") Long eventId,
-                                                                       @PathVariable("reqId") Long reqId);
+                                                                       @PathVariable("reqId") Long reqId)
+            throws UserNotFoundException, ForbiddenException, EventNotFoundException, ParticipationRequestNotFoundException;
 
     @RequestMapping(value = "/users/{userId}/requests/{requestId}/cancel",
             produces = {"application/json"},
             method = RequestMethod.PATCH)
     ResponseEntity<ParticipationRequestDto> cancelRequest(@PathVariable("userId") Long userId,
-                                                          @PathVariable("requestId") Long requestId);
+                                                          @PathVariable("requestId") Long requestId)
+            throws UserNotFoundException, ForbiddenException, ParticipationRequestNotFoundException;
 
     @RequestMapping(value = "/users/{userId}/events/{eventId}/requests/{reqId}/confirm",
             produces = {"application/json"},
             method = RequestMethod.PATCH)
     ResponseEntity<ParticipationRequestDto> confirmParticipationRequest(@PathVariable("userId") Long userId,
                                                                         @PathVariable("eventId") Long eventId,
-                                                                        @PathVariable("reqId") Long reqId);
+                                                                        @PathVariable("reqId") Long reqId)
+            throws UserNotFoundException, ForbiddenException, RequestLogicException, EventNotFoundException, ParticipationRequestNotFoundException;
 
     @RequestMapping(value = "/users/{userId}/events/{eventId}",
             produces = {"application/json"},
             method = RequestMethod.GET)
     ResponseEntity<EventFullDto> getEventOfCurrentUser(@PathVariable("userId") Long userId,
-                                                       @PathVariable("eventId") Long eventId);
+                                                       @PathVariable("eventId") Long eventId)
+            throws UserNotFoundException, ForbiddenException, EventNotFoundException;
 
     @RequestMapping(value = "/users/{userId}/events/{eventId}/requests",
             produces = {"application/json"},
             method = RequestMethod.GET)
     ResponseEntity<List<ParticipationRequestDto>> getEventParticipants(@PathVariable("userId") Long userId,
-                                                                       @PathVariable("eventId") Long eventId);
+                                                                       @PathVariable("eventId") Long eventId)
+            throws UserNotFoundException, ForbiddenException, EventNotFoundException;
 
     @RequestMapping(value = "/users/{userId}/events",
             produces = {"application/json"},
@@ -86,14 +97,16 @@ public interface UsersApi {
     @RequestMapping(value = "/users/{userId}/requests",
             produces = {"application/json"},
             method = RequestMethod.GET)
-    ResponseEntity<List<ParticipationRequestDto>> getUserRequests(@PathVariable("userId") Long userId);
+    ResponseEntity<List<ParticipationRequestDto>> getUserRequests(@PathVariable("userId") Long userId)
+            throws UserNotFoundException;
 
     @RequestMapping(value = "/users/{userId}/events",
             produces = {"application/json"},
             consumes = {"application/json"},
             method = RequestMethod.PATCH)
     ResponseEntity<EventFullDto> updateEventOfCurrentUser(@PathVariable("userId") Long userId,
-                                                          @Valid @RequestBody UpdateEventRequest body);
+                                                          @Valid @RequestBody UpdateEventRequest body)
+            throws ForbiddenException, RequestLogicException, EventNotFoundException;
 
 }
 

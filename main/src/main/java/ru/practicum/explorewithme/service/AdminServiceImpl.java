@@ -5,6 +5,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import ru.practicum.explorewithme.exceptions.EventTimeException;
+import ru.practicum.explorewithme.exceptions.RequestLogicException;
 import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
 import ru.practicum.explorewithme.model.AdminUpdateEventRequest;
 import ru.practicum.explorewithme.model.category.Category;
@@ -14,6 +16,7 @@ import ru.practicum.explorewithme.model.compilation.Compilation;
 import ru.practicum.explorewithme.model.compilation.NewCompilationDto;
 import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.State;
+import ru.practicum.explorewithme.model.participationrequest.Status;
 import ru.practicum.explorewithme.model.user.NewUserRequest;
 import ru.practicum.explorewithme.model.user.User;
 import ru.practicum.explorewithme.repository.CategoryRepository;
@@ -81,15 +84,22 @@ public class AdminServiceImpl implements AdminService {
                                          List<State> states,
                                          List<Long> categories,
                                          LocalDateTime rangeStart, LocalDateTime rangeEnd,
-                                         Integer from, Integer size) {
+                                         Integer from, Integer size) throws EventTimeException {
         Pageable page = CustomPageable.of(from, size);
         rangeStart = (rangeStart == null) ? LocalDateTime.MIN : rangeStart;
         rangeEnd = (rangeEnd == null) ? LocalDateTime.MAX : rangeEnd;
+        if (rangeStart.isAfter(rangeEnd)) {
+            throw new EventTimeException("start must be before end");
+        }
         return eventRepository.findAllByParams(users, states, categories, rangeStart, rangeEnd, page).getContent();
     }
 
     @Override
     public Event updateEvent(Long eventId, AdminUpdateEventRequest adminUpdateEventRequest) {
+        if (newParticipantLimit != null
+                && newParticipantLimit < participationRequestRepository.findAllByStatusAndEvent(Status.CONFIRMED, event).size()) {
+            throw new RequestLogicException("new request limit can't be less than current number of confirmed requests");
+        }
         return null;
     }
 

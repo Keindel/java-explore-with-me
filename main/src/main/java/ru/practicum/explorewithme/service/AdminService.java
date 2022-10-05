@@ -1,6 +1,7 @@
 package ru.practicum.explorewithme.service;
 
 import org.springframework.http.HttpStatus;
+import ru.practicum.explorewithme.exceptions.EventTimeException;
 import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
 import ru.practicum.explorewithme.model.AdminUpdateEventRequest;
 import ru.practicum.explorewithme.model.category.Category;
@@ -33,7 +34,7 @@ public interface AdminService {
                                   List<State> states,
                                   List<Long> categories,
                                   LocalDateTime rangeStart, LocalDateTime rangeEnd,
-                                  Integer from, Integer size);
+                                  Integer from, Integer size) throws EventTimeException;
 
     Event updateEvent(Long eventId, AdminUpdateEventRequest adminUpdateEventRequest);
 

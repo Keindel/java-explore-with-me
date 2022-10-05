@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import ru.practicum.explorewithme.exceptions.notfound.CategoryNotFoundException;
 import ru.practicum.explorewithme.model.category.Category;
 import ru.practicum.explorewithme.model.event.Event;
-import ru.practicum.explorewithme.model.event.EventFullDto;
+import ru.practicum.explorewithme.model.event.NewEventDto;
 import ru.practicum.explorewithme.repository.CategoryRepository;
 
 @Component
@@ -18,19 +18,25 @@ public class EventMapper {
 
     private final CategoryRepository categoryRepository;
 
-    private Converter<Long, Category> convertCat = src -> {
+//    public EventFullDto mapToFullDto(Event event) {
+//        modelMapper.typeMap(Event.class, EventFullDto.class).addMappings(m
+//                -> m.using(convertLongToCat).map(Event::getCategory, EventFullDto::setCategory));
+//        return modelMapper.map(event, EventFullDto.class);
+//    }
+
+    public <T> Event mapToEvent(T eventSomeDto) {
+        modelMapper.typeMap(NewEventDto.class, Event.class).addMappings(m
+                -> m.using(convertLongToCat).map(NewEventDto::getCategory, Event::setCategory));
+        return modelMapper.map(eventSomeDto, Event.class);
+    }
+
+    private Converter<Long, Category> convertLongToCat = src -> {
         try {
-            return src.getSource() == null ? null : findCategory(src.getSource());
+            return src.getSource() == null ? null : EventMapper.this.findCategory(src.getSource());
         } catch (CategoryNotFoundException e) {
             throw new RuntimeException(e);
         }
     };
-
-    public EventFullDto mapToFullDto(Event event) {
-        modelMapper.typeMap(Event.class, EventFullDto.class).addMappings(m
-                -> m.using(convertCat).map(Event::getCategory, EventFullDto::setCategory));
-        return modelMapper.map(event, EventFullDto.class);
-    }
 
     private Category findCategory(Long catId) throws CategoryNotFoundException {
         return categoryRepository.findById(catId).orElseThrow(() -> new CategoryNotFoundException(catId));

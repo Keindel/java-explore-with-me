@@ -1,13 +1,11 @@
 package ru.practicum.explorewithme.model.event;
 
-import java.time.LocalDateTime;
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 /**
  * Данные для изменения информации о событии
@@ -29,10 +27,13 @@ public class UpdateEventRequest   {
 
   private LocalDateTime eventDate;
 
+  @NotNull
+  @Min(1)
   private Long eventId;
 
   private Boolean paid;
 
+  @Min(0)
   private Integer participantLimit;
 
   private String title;

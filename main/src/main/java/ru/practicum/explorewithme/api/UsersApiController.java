@@ -4,9 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.explorewithme.exceptions.ForbiddenException;
+import ru.practicum.explorewithme.exceptions.notfound.CategoryNotFoundException;
 import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
 import ru.practicum.explorewithme.exceptions.EventTimeException;
 import ru.practicum.explorewithme.exceptions.RequestLogicException;
+import ru.practicum.explorewithme.exceptions.notfound.ParticipationRequestNotFoundException;
 import ru.practicum.explorewithme.exceptions.notfound.UserNotFoundException;
 import ru.practicum.explorewithme.mapper.EventMapper;
 import ru.practicum.explorewithme.model.event.EventFullDto;
@@ -49,7 +52,8 @@ public class UsersApiController implements UsersApi {
 
     @PatchMapping("/{userId}/events")
     public ResponseEntity<EventFullDto> updateEventOfCurrentUser(@PathVariable("userId") Long userId,
-                                                                 @Valid @RequestBody UpdateEventRequest updateEventRequest) {
+                                                                 @Valid @RequestBody UpdateEventRequest updateEventRequest)
+            throws ForbiddenException, RequestLogicException, EventNotFoundException {
         return new ResponseEntity<>(modelMapper.map(userService.updateEventOfCurrentUser(userId, updateEventRequest),
                 EventFullDto.class),
                 HttpStatus.OK);
@@ -58,14 +62,18 @@ public class UsersApiController implements UsersApi {
     @PostMapping("/{userId}/events")
     public ResponseEntity<EventFullDto> addEvent(@PathVariable("userId") Long userId,
                                                  @Valid @RequestBody NewEventDto newEventDto)
-            throws EventTimeException, UserNotFoundException {
-        return new ResponseEntity<>(eventMapper.mapToFullDto(userService.addEvent(userId, newEventDto)),
+            throws EventTimeException, UserNotFoundException, CategoryNotFoundException {
+        return new ResponseEntity<>(modelMapper.map(userService.addEvent(userId, newEventDto),
+                EventFullDto.class),
                 HttpStatus.OK);
+//        return new ResponseEntity<>(eventMapper.mapToFullDto(userService.addEvent(userId, newEventDto)),
+//                HttpStatus.OK);
     }
 
     @GetMapping("/{userId}/events/{eventId}")
     public ResponseEntity<EventFullDto> getEventOfCurrentUser(@PathVariable("userId") Long userId,
-                                                              @PathVariable("eventId") Long eventId) {
+                                                              @PathVariable("eventId") Long eventId)
+            throws UserNotFoundException, ForbiddenException, EventNotFoundException {
         return new ResponseEntity<>(modelMapper.map(userService.getEventOfCurrentUser(userId, eventId),
                 EventFullDto.class),
                 HttpStatus.OK);
@@ -73,7 +81,8 @@ public class UsersApiController implements UsersApi {
 
     @PatchMapping("/{userId}/events/{eventId}")
     public ResponseEntity<EventFullDto> cancelEventOfCurrentUser(@PathVariable("userId") Long userId,
-                                                                 @PathVariable("eventId") Long eventId) {
+                                                                 @PathVariable("eventId") Long eventId)
+            throws UserNotFoundException, ForbiddenException, EventNotFoundException {
         return new ResponseEntity<>(modelMapper.map(userService.cancelEventOfCurrentUser(userId, eventId),
                 EventFullDto.class),
                 HttpStatus.OK);
@@ -81,7 +90,8 @@ public class UsersApiController implements UsersApi {
 
     @GetMapping("/{userId}/events/{eventId}/requests")
     public ResponseEntity<List<ParticipationRequestDto>> getEventParticipants(@PathVariable("userId") Long userId,
-                                                                              @PathVariable("eventId") Long eventId) {
+                                                                              @PathVariable("eventId") Long eventId)
+            throws UserNotFoundException, ForbiddenException, EventNotFoundException {
         return new ResponseEntity<>(listModelMapper.mapList(userService.getEventParticipants(userId, eventId),
                 ParticipationRequestDto.class),
                 HttpStatus.OK);
@@ -90,7 +100,8 @@ public class UsersApiController implements UsersApi {
     @PatchMapping("/{userId}/events/{eventId}/requests/{reqId}/confirm")
     public ResponseEntity<ParticipationRequestDto> confirmParticipationRequest(@PathVariable("userId") Long userId,
                                                                                @PathVariable("eventId") Long eventId,
-                                                                               @PathVariable("reqId") Long reqId) {
+                                                                               @PathVariable("reqId") Long reqId)
+            throws UserNotFoundException, ForbiddenException, RequestLogicException, EventNotFoundException, ParticipationRequestNotFoundException {
         return new ResponseEntity<>(modelMapper.map(userService.confirmParticipationRequest(userId, eventId, reqId),
                 ParticipationRequestDto.class),
                 HttpStatus.OK);
@@ -99,14 +110,16 @@ public class UsersApiController implements UsersApi {
     @PatchMapping("/{userId}/events/{eventId}/requests/{reqId}/reject")
     public ResponseEntity<ParticipationRequestDto> rejectParticipationRequest(@PathVariable("userId") Long userId,
                                                                               @PathVariable("eventId") Long eventId,
-                                                                              @PathVariable("reqId") Long reqId) {
+                                                                              @PathVariable("reqId") Long reqId)
+            throws UserNotFoundException, ForbiddenException, EventNotFoundException, ParticipationRequestNotFoundException {
         return new ResponseEntity<>(modelMapper.map(userService.rejectParticipationRequest(userId, eventId, reqId),
                 ParticipationRequestDto.class),
                 HttpStatus.OK);
     }
 
     @GetMapping("/{userId}/requests")
-    public ResponseEntity<List<ParticipationRequestDto>> getUserRequests(@PathVariable("userId") Long userId) {
+    public ResponseEntity<List<ParticipationRequestDto>> getUserRequests(@PathVariable("userId") Long userId)
+            throws UserNotFoundException {
         return new ResponseEntity<>(listModelMapper.mapList(userService.getUserRequests(userId),
                 ParticipationRequestDto.class),
                 HttpStatus.OK);
@@ -124,7 +137,8 @@ public class UsersApiController implements UsersApi {
 
     @PatchMapping("/{userId}/requests/{requestId}/cancel")
     public ResponseEntity<ParticipationRequestDto> cancelRequest(@PathVariable("userId") Long userId,
-                                                                 @PathVariable("requestId") Long requestId) {
+                                                                 @PathVariable("requestId") Long requestId)
+            throws UserNotFoundException, ForbiddenException, ParticipationRequestNotFoundException {
         return new ResponseEntity<>(modelMapper.map(userService.cancelRequest(userId, requestId),
                 ParticipationRequestDto.class),
                 HttpStatus.OK);

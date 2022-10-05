@@ -5,10 +5,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import ru.practicum.explorewithme.exceptions.ForbiddenException;
 import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
 import ru.practicum.explorewithme.exceptions.EventTimeException;
 import ru.practicum.explorewithme.exceptions.RequestLogicException;
+import ru.practicum.explorewithme.exceptions.notfound.ParticipationRequestNotFoundException;
 import ru.practicum.explorewithme.exceptions.notfound.UserNotFoundException;
+import ru.practicum.explorewithme.mapper.EventMapper;
 import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.NewEventDto;
 import ru.practicum.explorewithme.model.event.State;
@@ -22,12 +25,15 @@ import ru.practicum.explorewithme.util.CustomPageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final ModelMapper modelMapper;
+
+    private final EventMapper eventMapper;
 
     private final UserRepository userRepository;
 
@@ -46,8 +52,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Event updateEventOfCurrentUser(Long userId, UpdateEventRequest updateEventRequest) {
-        return null;
+    public Event updateEventOfCurrentUser(Long userId, UpdateEventRequest updateEventRequest)
+            throws EventNotFoundException, ForbiddenException, RequestLogicException {
+        Long eventId = updateEventRequest.getEventId();
+        Event event = eventRepository.findById(eventId).orElseThrow(()
+                -> new EventNotFoundException(eventId));
+        if (!Objects.equals(event.getInitiator().getId(), userId)) {
+            throw new ForbiddenException("no access rights for current user");
+        }
+        if (event.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
+            throw new ForbiddenException("event starts too soon for changes");
+        }
+        State eventState = event.getState();
+        // изменить можно только отмененные события или события в состоянии ожидания модерации
+        if (eventState == State.PUBLISHED) {
+            throw new ForbiddenException("event state forbids further changes");
+        }
+        Integer newParticipantLimit = updateEventRequest.getParticipantLimit();
+        if (newParticipantLimit != null
+                && newParticipantLimit < participationRequestRepository.findAllByStatusAndEvent(Status.CONFIRMED, event).size()) {
+            throw new RequestLogicException("new request limit can't be less than current number of confirmed requests");
+        }
+        Event eventUpdate = eventMapper.mapToEvent(updateEventRequest);
+        eventUpdate.setState(State.PENDING);
+        return eventRepository.save(eventUpdate);
     }
 
     @Override
@@ -55,65 +83,122 @@ public class UserServiceImpl implements UserService {
         if (newEventDto.getEventDate().minusHours(2).isBefore(LocalDateTime.now())) {
             throw new EventTimeException("Only pending or canceled events can be changed");
         }
-        Event event = modelMapper.map(newEventDto, Event.class);
-
+        Event event = eventMapper.mapToEvent(newEventDto);
         Location location = locationRepository.save(newEventDto.getLocation());
+
         event.setLocation(location);
-
-        event.setCategory(categoryRepository.findById(newEventDto.getCategory()).get());
         event.setState(State.PENDING);
-
         event.setCreatedOn(LocalDateTime.now());
         event.setInitiator(userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(String.format("User with id=%d was not found.", userId))));
+                .orElseThrow(() -> new UserNotFoundException(userId)));
         return eventRepository.save(event);
     }
 
     @Override
-    public Event getEventOfCurrentUser(Long userId, Long eventId) {
-        return null;
+    public Event getEventOfCurrentUser(Long userId, Long eventId)
+            throws UserNotFoundException, EventNotFoundException, ForbiddenException {
+        return getEventCheckedByOwner(userId, eventId);
+    }
+
+    private Event getEventCheckedByOwner(Long userId, Long eventId)
+            throws UserNotFoundException, EventNotFoundException, ForbiddenException {
+        User user = userRepository.findById(userId).orElseThrow(()
+                -> new UserNotFoundException(userId));
+        Event event = eventRepository.findById(eventId).orElseThrow(()
+                -> new EventNotFoundException(eventId));
+        if (event.getInitiator() != user) {
+            throw new ForbiddenException("event does not belong to current user");
+        }
+        return event;
     }
 
     @Override
-    public Event cancelEventOfCurrentUser(Long userId, Long eventId) {
-        return null;
+    public Event cancelEventOfCurrentUser(Long userId, Long eventId)
+            throws UserNotFoundException, EventNotFoundException, ForbiddenException {
+        Event event = getEventCheckedByOwner(userId, eventId);
+        if (event.getState() != State.PENDING) {
+            throw new ForbiddenException("event state forbids cancellation");
+        }
+        return event;
     }
 
     @Override
-    public List<ParticipationRequest> getEventParticipants(Long userId, Long eventId) {
-        return null;
+    public List<ParticipationRequest> getEventParticipants(Long userId, Long eventId)
+            throws UserNotFoundException, ForbiddenException, EventNotFoundException {
+        Event event = getEventCheckedByOwner(userId, eventId);
+        return participationRequestRepository.findAllByEvent(event);
     }
 
     @Override
-    public ParticipationRequest confirmParticipationRequest(Long userId, Long eventId, Long reqId) {
-        return null;
+    public ParticipationRequest confirmParticipationRequest(Long userId, Long eventId, Long reqId)
+            throws UserNotFoundException, EventNotFoundException, ParticipationRequestNotFoundException, ForbiddenException, RequestLogicException {
+        Event event = getEventCheckedByOwner(userId, eventId);
+        ParticipationRequest req = participationRequestRepository.findById(reqId).orElseThrow(()
+                -> new ParticipationRequestNotFoundException(reqId));
+        // если для события лимит заявок равен 0 или отключена пре-модерация заявок, то подтверждение заявок не требуется
+        if (Boolean.FALSE.equals(event.getRequestModeration())
+                || event.getParticipantLimit() == 0) {
+            return req;
+        }
+        int confirmedRequestsNumber = participationRequestRepository.findAllByStatusAndEvent(Status.CONFIRMED, event).size();
+        // нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие
+        if (confirmedRequestsNumber >= event.getParticipantLimit()
+                && event.getParticipantLimit() != 0) {
+            throw new RequestLogicException("Requests limit is reached");
+        }
+        req.setStatus(Status.CONFIRMED);
+        req = participationRequestRepository.save(req);
+        // если при подтверждении данной заявки, лимит заявок для события исчерпан, то все неподтверждённые заявки необходимо отклонить
+        if (confirmedRequestsNumber == event.getParticipantLimit() - 1) {
+            //TODO check Hibernate generated SQL; replace for SQL Query?
+            participationRequestRepository.findAllByStatusAndEvent(Status.PENDING, event)
+                    .stream().peek(r -> r.setStatus(Status.CANCELED)).forEach(participationRequestRepository::save);
+        }
+        return req;
     }
 
     @Override
-    public ParticipationRequest rejectParticipationRequest(Long userId, Long eventId, Long reqId) {
-        return null;
+    public ParticipationRequest rejectParticipationRequest(Long userId, Long eventId, Long reqId)
+            throws UserNotFoundException, ForbiddenException, EventNotFoundException, ParticipationRequestNotFoundException {
+        Event event = getEventCheckedByOwner(userId, eventId);
+        ParticipationRequest req = participationRequestRepository.findById(reqId).orElseThrow(()
+                -> new ParticipationRequestNotFoundException(reqId));
+        if (req.getEvent() != event) {
+            throw new ForbiddenException("request does not belong to the event");
+        }
+        req.setStatus(Status.REJECTED);
+        return participationRequestRepository.save(req);
     }
 
     @Override
-    public List<ParticipationRequest> getUserRequests(Long userId) {
-        return null;
+    public List<ParticipationRequest> getUserRequests(Long userId) throws UserNotFoundException {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        return participationRequestRepository.findAllByRequester(user);
     }
 
     @Override
     public ParticipationRequest addParticipationRequest(Long userId, Long eventId) throws UserNotFoundException, EventNotFoundException, RequestLogicException {
+        // нельзя добавить повторный запрос - реализовано на уровне БД как UNIQUE(user_id, event_id)
         User currentUser = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
+        // инициатор события не может добавить запрос на участие в своём событии
         if (event.getInitiator().equals(currentUser)) {
             throw new RequestLogicException("Initiator cant request");
         }
+        // нельзя участвовать в неопубликованном событии
         if (event.getPublishedOn() == null) {
             throw new RequestLogicException("Cant request not published event");
         }
-//        if (event.getConfirmedRequests() >= event.getParticipantLimit()) {
-//            throw new RequestLogicException("Requests limit is reached");
-//        }
+        // если у события достигнут лимит запросов на участие - необходимо вернуть ошибку
+        if (participationRequestRepository.findAllByStatusAndEvent(Status.CONFIRMED, event).size()
+                >= event.getParticipantLimit()
+                && event.getParticipantLimit() != 0) {
+            throw new RequestLogicException("Requests limit is reached");
+        }
         Status status = Status.PENDING;
-        if (Boolean.FALSE.equals(event.getRequestModeration())) {
+        // если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного
+        if (Boolean.FALSE.equals(event.getRequestModeration())
+                || event.getParticipantLimit() == 0) {
             status = Status.CONFIRMED;
         }
         ParticipationRequest participationRequest = new ParticipationRequest(LocalDateTime.now(),
@@ -123,19 +208,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ParticipationRequest cancelRequest(Long userId, Long requestId) {
-        return null;
-    }
-
-    private void validateUserPresence (Long userId) throws UserNotFoundException {
-        if (! userRepository.existsById(userId)) {
-            throw new UserNotFoundException(userId);
+    public ParticipationRequest cancelRequest(Long userId, Long requestId)
+            throws UserNotFoundException, ParticipationRequestNotFoundException, ForbiddenException {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        ParticipationRequest req = participationRequestRepository.findById(requestId).orElseThrow(()
+        -> new ParticipationRequestNotFoundException(requestId));
+        if (req.getRequester() != user) {
+            throw new ForbiddenException("request does not belong to the user");
         }
-    }
-
-    private void validateEventPresence (Long eventId) throws EventNotFoundException {
-        if (! eventRepository.existsById(eventId)) {
-            throw new EventNotFoundException(eventId);
-        }
+        req.setStatus(Status.CANCELED);
+        return req;
     }
 }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.explorewithme.exceptions.notfound.CompilationNotFoundException;
 import ru.practicum.explorewithme.model.compilation.CompilationDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +27,7 @@ public class CompilationsApiController implements CompilationsApi {
     private final CompilationService compilationService;
 
     @GetMapping("/{compId}")
-    public ResponseEntity<CompilationDto> getCompilationById(@PathVariable("compId") Long compId) {
+    public ResponseEntity<CompilationDto> getCompilationById(@PathVariable("compId") Long compId) throws CompilationNotFoundException {
         return new ResponseEntity<>(modelMapper.map(compilationService.getById(compId), CompilationDto.class),
                 HttpStatus.OK);
     }

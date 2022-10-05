@@ -1,10 +1,9 @@
 package ru.practicum.explorewithme.model.event;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
-import ru.practicum.explorewithme.model.location.Location;
 import ru.practicum.explorewithme.model.category.CategoryDto;
+import ru.practicum.explorewithme.model.location.Location;
 import ru.practicum.explorewithme.model.user.UserShortDto;
 
 import java.time.LocalDateTime;

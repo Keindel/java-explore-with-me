@@ -11,10 +11,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import ru.practicum.explorewithme.exceptions.EventTimeException;
+import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
 import ru.practicum.explorewithme.model.event.EventFullDto;
 import ru.practicum.explorewithme.model.event.EventShortDto;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Validated
@@ -23,7 +26,7 @@ public interface EventsApi {
     @RequestMapping(value = "/events/{id}",
             produces = {"application/json"},
             method = RequestMethod.GET)
-    ResponseEntity<EventFullDto> getEventById(@PathVariable("id") Long id);
+    ResponseEntity<EventFullDto> getEventById(@PathVariable("id") Long id) throws EventNotFoundException;
 
     @RequestMapping(value = "/events",
             produces = {"application/json"},
@@ -31,11 +34,11 @@ public interface EventsApi {
     ResponseEntity<List<EventShortDto>> getEventsShort(@Valid @RequestParam(value = "text", required = false) String text,
                                                        @Valid @RequestParam(value = "categories", required = false) List<Long> categories,
                                                        @Valid @RequestParam(value = "paid", required = false) Boolean paid,
-                                                       @Valid @RequestParam(value = "rangeStart", required = false) String rangeStart,
-                                                       @Valid @RequestParam(value = "rangeEnd", required = false) String rangeEnd,
+                                                       @Valid @RequestParam(value = "rangeStart", required = false) LocalDateTime rangeStart,
+                                                       @Valid @RequestParam(value = "rangeEnd", required = false) LocalDateTime rangeEnd,
                                                        @Valid @RequestParam(value = "onlyAvailable", required = false, defaultValue = "false") Boolean onlyAvailable,
                                                        @Valid @RequestParam(value = "sort", required = false) String sort,
                                                        @Valid @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
-                                                       @Valid @RequestParam(value = "size", required = false, defaultValue = "10") Integer size);
+                                                       @Valid @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) throws EventTimeException;
 }
 
