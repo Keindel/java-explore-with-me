@@ -2,14 +2,13 @@ package ru.practicum.explorewithme.api;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.explorewithme.exceptions.EventTimeException;
 import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
-import ru.practicum.explorewithme.mapper.ListModelMapper;
+import ru.practicum.explorewithme.mapper.EventMapper;
 import ru.practicum.explorewithme.model.event.EventFullDto;
 import ru.practicum.explorewithme.model.event.EventShortDto;
 import ru.practicum.explorewithme.service.EventService;
@@ -17,6 +16,7 @@ import ru.practicum.explorewithme.service.EventService;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -24,9 +24,7 @@ import java.util.List;
 @RequestMapping(path = "/events")
 public class EventsApiController implements EventsApi {
 
-    private final ModelMapper modelMapper;
-
-    private final ListModelMapper listModelMapper;
+    private final EventMapper eventMapper;
 
     private final EventService eventService;
 
@@ -43,9 +41,9 @@ public class EventsApiController implements EventsApi {
                                                               @Valid @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
                                                               @Valid @RequestParam(value = "size", required = false, defaultValue = "10") Integer size)
             throws EventTimeException {
-        return new ResponseEntity<>(listModelMapper.mapList(eventService
-                        .getEventsShort(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, stringSort, from, size),
-                EventShortDto.class),
+        return new ResponseEntity<>(eventService
+                .getEventsShort(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, stringSort, from, size)
+                .stream().map(eventMapper::mapToShortDto).collect(Collectors.toList()),
                 HttpStatus.OK);
     }
 

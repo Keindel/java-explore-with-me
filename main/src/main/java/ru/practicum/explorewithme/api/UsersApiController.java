@@ -26,6 +26,7 @@ import ru.practicum.explorewithme.mapper.ListModelMapper;
 import javax.validation.constraints.*;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -47,9 +48,9 @@ public class UsersApiController implements UsersApi {
     public ResponseEntity<List<EventShortDto>> getEventsAddedByCurrentUser(@PathVariable("userId") Long userId,
                                                                            @Valid @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
                                                                            @Valid @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
-        return new ResponseEntity<>(listModelMapper.mapList(userService
-                        .getEventsAddedByCurrentUser(userId, from, size),
-                EventShortDto.class),
+        return new ResponseEntity<>(userService
+                .getEventsAddedByCurrentUser(userId, from, size)
+                .stream().map(eventMapper::mapToShortDto).collect(Collectors.toList()),
                 HttpStatus.OK);
     }
 
@@ -66,11 +67,8 @@ public class UsersApiController implements UsersApi {
     public ResponseEntity<EventFullDto> addEvent(@PathVariable("userId") Long userId,
                                                  @Valid @RequestBody NewEventDto newEventDto)
             throws EventTimeException, UserNotFoundException, CategoryNotFoundException {
-        return new ResponseEntity<>(modelMapper.map(userService.addEvent(userId, newEventDto),
-                EventFullDto.class),
+        return new ResponseEntity<>(eventMapper.mapToFullDto(userService.addEvent(userId, newEventDto)),
                 HttpStatus.OK);
-//        return new ResponseEntity<>(eventMapper.mapToFullDto(userService.addEvent(userId, newEventDto)),
-//                HttpStatus.OK);
     }
 
     @GetMapping("/{userId}/events/{eventId}")

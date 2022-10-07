@@ -106,7 +106,7 @@ public class EventServiceImpl implements EventService {
                 .block()
                 .getHits();
 */
-        EventFullDto eventFullDto = modelMapper.map(event, EventFullDto.class);
+        EventFullDto eventFullDto = eventMapper.mapToFullDto(event);
 //        eventFullDto.setViews(views);
         return eventFullDto;
     }

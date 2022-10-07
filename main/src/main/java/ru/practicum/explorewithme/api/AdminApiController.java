@@ -10,6 +10,7 @@ import ru.practicum.explorewithme.exceptions.ForbiddenException;
 import ru.practicum.explorewithme.exceptions.RequestLogicException;
 import ru.practicum.explorewithme.exceptions.notfound.CompilationNotFoundException;
 import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
+import ru.practicum.explorewithme.mapper.EventMapper;
 import ru.practicum.explorewithme.model.event.AdminUpdateEventRequest;
 import ru.practicum.explorewithme.model.category.CategoryDto;
 import ru.practicum.explorewithme.model.compilation.CompilationDto;
@@ -27,6 +28,7 @@ import ru.practicum.explorewithme.mapper.ListModelMapper;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -35,6 +37,8 @@ import java.util.List;
 public class AdminApiController implements AdminApi {
 
     private final ModelMapper modelMapper;
+
+    private final EventMapper eventMapper;
 
     private final ListModelMapper listModelMapper;
 
@@ -83,15 +87,15 @@ public class AdminApiController implements AdminApi {
                                                                 @Valid @RequestParam(value = "states", required = false) List<State> states,
                                                                 @Valid @RequestParam(value = "categories", required = false) List<Long> categories,
                                                                 @Valid @RequestParam(value = "rangeStart", required = false)
-                                                                    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
+                                                                @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
                                                                 @Valid @RequestParam(value = "rangeEnd", required = false)
-                                                                    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
+                                                                @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
                                                                 @Valid @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
                                                                 @Valid @RequestParam(value = "size", required = false, defaultValue = "10") Integer size)
             throws EventTimeException {
-        return new ResponseEntity<>(listModelMapper.mapList(adminService.
-                        getEventsDetailed(users, states, categories, rangeStart, rangeEnd, from, size),
-                EventFullDto.class),
+        return new ResponseEntity<>((adminService.
+                getEventsDetailed(users, states, categories, rangeStart, rangeEnd, from, size)
+                .stream().map(eventMapper::mapToFullDto).collect(Collectors.toList())),
                 HttpStatus.OK);
     }
 
@@ -99,24 +103,21 @@ public class AdminApiController implements AdminApi {
     public ResponseEntity<EventFullDto> updateEvent(@PathVariable("eventId") Long eventId,
                                                     @Valid @RequestBody AdminUpdateEventRequest adminUpdateEventRequest)
             throws RequestLogicException, EventNotFoundException {
-        return new ResponseEntity<>(modelMapper.map(adminService.updateEvent(eventId, adminUpdateEventRequest),
-                EventFullDto.class),
+        return new ResponseEntity<>(eventMapper.mapToFullDto(adminService.updateEvent(eventId, adminUpdateEventRequest)),
                 HttpStatus.OK);
     }
 
     @PatchMapping("/events/{eventId}/publish")
     public ResponseEntity<EventFullDto> publishEvent(@PathVariable("eventId") Long eventId)
             throws EventTimeException, ForbiddenException, EventNotFoundException {
-        return new ResponseEntity<>(modelMapper.map(adminService.publishEvent(eventId),
-                EventFullDto.class),
+        return new ResponseEntity<>(eventMapper.mapToFullDto(adminService.publishEvent(eventId)),
                 HttpStatus.OK);
     }
 
     @PatchMapping("/events/{eventId}/reject")
     public ResponseEntity<EventFullDto> rejectEvent(@PathVariable("eventId") Long eventId)
             throws ForbiddenException, EventNotFoundException {
-        return new ResponseEntity<>(modelMapper.map(adminService.rejectEvent(eventId),
-                EventFullDto.class),
+        return new ResponseEntity<>(eventMapper.mapToFullDto(adminService.rejectEvent(eventId)),
                 HttpStatus.OK);
     }
 

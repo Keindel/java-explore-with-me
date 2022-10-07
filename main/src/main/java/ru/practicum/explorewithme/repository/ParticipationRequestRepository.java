@@ -26,6 +26,10 @@ public interface ParticipationRequestRepository extends JpaRepository<Participat
 //            "AND req.status = :status ")
 //////    List<ReqCount> countByStatusAndEvent(Status status, Event event);
 //    ReqCount countByStatusAndEvent(Status status, Event event);
+    @Query("SELECT COUNT(req) FROM ParticipationRequest req " +
+            "WHERE req.event = :event " +
+            "AND (req.status = 'PENDING' OR req.status = 'CONFIRMED')")
+    Long countPendingAndConfirmedByEvent(Event event);
 
     List<ParticipationRequest> findAllByRequester(User user);
 }

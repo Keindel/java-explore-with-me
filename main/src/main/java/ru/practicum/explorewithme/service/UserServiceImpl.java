@@ -119,7 +119,8 @@ public class UserServiceImpl implements UserService {
         if (event.getState() != State.PENDING) {
             throw new ForbiddenException("event state forbids cancellation");
         }
-        return event;
+        event.setState(State.CANCELED);
+        return eventRepository.save(event);
     }
 
     @Override
@@ -198,8 +199,7 @@ public class UserServiceImpl implements UserService {
         }
         Status status = Status.PENDING;
         // если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного
-        if (Boolean.FALSE.equals(event.getRequestModeration())
-                || event.getParticipantLimit() == 0) {
+        if (Boolean.FALSE.equals(event.getRequestModeration())) {
             status = Status.CONFIRMED;
         }
         ParticipationRequest participationRequest = new ParticipationRequest(LocalDateTime.now(),

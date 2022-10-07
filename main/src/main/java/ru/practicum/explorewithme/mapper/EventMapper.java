@@ -5,12 +5,11 @@ import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import ru.practicum.explorewithme.exceptions.notfound.CategoryNotFoundException;
-import ru.practicum.explorewithme.model.event.AdminUpdateEventRequest;
+import ru.practicum.explorewithme.model.event.*;
 import ru.practicum.explorewithme.model.category.Category;
-import ru.practicum.explorewithme.model.event.Event;
-import ru.practicum.explorewithme.model.event.NewEventDto;
-import ru.practicum.explorewithme.model.event.UpdateEventRequest;
+import ru.practicum.explorewithme.model.participationrequest.Status;
 import ru.practicum.explorewithme.repository.CategoryRepository;
+import ru.practicum.explorewithme.repository.ParticipationRequestRepository;
 
 @Component
 @RequiredArgsConstructor
@@ -19,6 +18,8 @@ public class EventMapper {
     private final ModelMapper modelMapper;
 
     private final CategoryRepository categoryRepository;
+
+    private final ParticipationRequestRepository requestRepository;
 
     private Converter<Long, Category> convertLongToCat = src -> {
         try {
@@ -49,5 +50,25 @@ public class EventMapper {
 
     private Category findCategory(Long catId) throws CategoryNotFoundException {
         return categoryRepository.findById(catId).orElseThrow(() -> new CategoryNotFoundException(catId));
+    }
+
+    public EventFullDto mapToFullDto(Event event) {
+        EventFullDto eventFullDto = modelMapper.map(event, EventFullDto.class);
+        if (Boolean.FALSE.equals(event.getRequestModeration())) {
+            eventFullDto.setConfirmedRequests(requestRepository.countPendingAndConfirmedByEvent(event));
+        } else {
+            eventFullDto.setConfirmedRequests(requestRepository.countByStatusAndEvent(Status.CONFIRMED, event));
+        }
+        return eventFullDto;
+    }
+
+    public EventShortDto mapToShortDto(Event event) {
+        EventShortDto eventShortDto = modelMapper.map(event, EventShortDto.class);
+        if (Boolean.FALSE.equals(event.getRequestModeration())) {
+            eventShortDto.setConfirmedRequests(requestRepository.countPendingAndConfirmedByEvent(event));
+        } else {
+            eventShortDto.setConfirmedRequests(requestRepository.countByStatusAndEvent(Status.CONFIRMED, event));
+        }
+        return eventShortDto;
     }
 }
