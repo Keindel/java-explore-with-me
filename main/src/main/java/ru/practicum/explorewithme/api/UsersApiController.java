@@ -12,6 +12,7 @@ import ru.practicum.explorewithme.exceptions.RequestLogicException;
 import ru.practicum.explorewithme.exceptions.notfound.ParticipationRequestNotFoundException;
 import ru.practicum.explorewithme.exceptions.notfound.UserNotFoundException;
 import ru.practicum.explorewithme.mapper.EventMapper;
+import ru.practicum.explorewithme.mapper.ParticipationMapper;
 import ru.practicum.explorewithme.model.event.EventFullDto;
 import ru.practicum.explorewithme.model.event.EventShortDto;
 import ru.practicum.explorewithme.model.event.NewEventDto;
@@ -35,6 +36,8 @@ public class UsersApiController implements UsersApi {
     private final ModelMapper modelMapper;
 
     private final EventMapper eventMapper;
+
+    private final ParticipationMapper participationMapper;
 
     private final ListModelMapper listModelMapper;
 
@@ -130,8 +133,8 @@ public class UsersApiController implements UsersApi {
             @PathVariable("userId") Long userId,
             @NotNull @Valid @RequestParam(value = "eventId", required = true) Long eventId)
             throws UserNotFoundException, RequestLogicException, EventNotFoundException {
-        return new ResponseEntity<>(modelMapper.map(userService.addParticipationRequest(userId, eventId),
-                ParticipationRequestDto.class),
+        return new ResponseEntity<>(participationMapper
+                .mapToParticipationRequestDto(userService.addParticipationRequest(userId, eventId)),
                 HttpStatus.OK);
     }
 

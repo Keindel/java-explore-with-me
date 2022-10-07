@@ -30,7 +30,7 @@ public class ParticipationRequest {
     private Long id;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "requester_id")
     @ToString.Exclude
     private User requester;
 

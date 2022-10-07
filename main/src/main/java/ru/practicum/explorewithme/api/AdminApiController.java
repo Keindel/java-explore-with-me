@@ -6,8 +6,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.explorewithme.exceptions.EventTimeException;
+import ru.practicum.explorewithme.exceptions.ForbiddenException;
+import ru.practicum.explorewithme.exceptions.RequestLogicException;
+import ru.practicum.explorewithme.exceptions.notfound.CompilationNotFoundException;
 import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
-import ru.practicum.explorewithme.model.AdminUpdateEventRequest;
+import ru.practicum.explorewithme.model.event.AdminUpdateEventRequest;
 import ru.practicum.explorewithme.model.category.CategoryDto;
 import ru.practicum.explorewithme.model.compilation.CompilationDto;
 import ru.practicum.explorewithme.model.event.EventFullDto;
@@ -44,7 +47,7 @@ public class AdminApiController implements AdminApi {
                 HttpStatus.OK);
     }
 
-    @PatchMapping("/admin/categories")
+    @PatchMapping("/categories")
     public ResponseEntity<CategoryDto> updateCategory(@Valid @RequestBody CategoryDto categoryDto) {
         return new ResponseEntity<>(modelMapper.map(adminService
                 .updateCategory(categoryDto), CategoryDto.class),
@@ -94,21 +97,24 @@ public class AdminApiController implements AdminApi {
 
     @PutMapping("/events/{eventId}")
     public ResponseEntity<EventFullDto> updateEvent(@PathVariable("eventId") Long eventId,
-                                                    @Valid @RequestBody AdminUpdateEventRequest adminUpdateEventRequest) {
+                                                    @Valid @RequestBody AdminUpdateEventRequest adminUpdateEventRequest)
+            throws RequestLogicException, EventNotFoundException {
         return new ResponseEntity<>(modelMapper.map(adminService.updateEvent(eventId, adminUpdateEventRequest),
                 EventFullDto.class),
                 HttpStatus.OK);
     }
 
     @PatchMapping("/events/{eventId}/publish")
-    public ResponseEntity<EventFullDto> publishEvent(@PathVariable("eventId") Long eventId) {
+    public ResponseEntity<EventFullDto> publishEvent(@PathVariable("eventId") Long eventId)
+            throws EventTimeException, ForbiddenException, EventNotFoundException {
         return new ResponseEntity<>(modelMapper.map(adminService.publishEvent(eventId),
                 EventFullDto.class),
                 HttpStatus.OK);
     }
 
     @PatchMapping("/events/{eventId}/reject")
-    public ResponseEntity<EventFullDto> rejectEvent(@PathVariable("eventId") Long eventId) {
+    public ResponseEntity<EventFullDto> rejectEvent(@PathVariable("eventId") Long eventId)
+            throws ForbiddenException, EventNotFoundException {
         return new ResponseEntity<>(modelMapper.map(adminService.rejectEvent(eventId),
                 EventFullDto.class),
                 HttpStatus.OK);
@@ -129,23 +135,27 @@ public class AdminApiController implements AdminApi {
 
     @DeleteMapping("/compilations/{compId}/events/{eventId}")
     public ResponseEntity<Void> removeEventFromCompilation(@PathVariable("compId") Long compId,
-                                                           @PathVariable("eventId") Long eventId) {
+                                                           @PathVariable("eventId") Long eventId)
+            throws CompilationNotFoundException, EventNotFoundException {
         return new ResponseEntity<>(adminService.removeEventFromCompilation(compId, eventId));
     }
 
     @PatchMapping("/compilations/{compId}/events/{eventId}")
     public ResponseEntity<Void> addEventToCompilation(@PathVariable("compId") Long compId,
-                                                      @PathVariable("eventId") Long eventId) {
+                                                      @PathVariable("eventId") Long eventId)
+            throws CompilationNotFoundException, EventNotFoundException {
         return new ResponseEntity<>(adminService.addEventToCompilation(compId, eventId));
     }
 
     @DeleteMapping("/compilations/{compId}/pin")
-    public ResponseEntity<Void> unpinCompilation(@PathVariable("compId") Long compId) {
+    public ResponseEntity<Void> unpinCompilation(@PathVariable("compId") Long compId)
+            throws CompilationNotFoundException {
         return new ResponseEntity<>(adminService.unpinCompilation(compId));
     }
 
     @PatchMapping("/compilations/{compId}/pin")
-    public ResponseEntity<Void> pinCompilation(@PathVariable("compId") Long compId) {
+    public ResponseEntity<Void> pinCompilation(@PathVariable("compId") Long compId)
+            throws CompilationNotFoundException {
         return new ResponseEntity<>(adminService.pinCompilation(compId));
     }
 }

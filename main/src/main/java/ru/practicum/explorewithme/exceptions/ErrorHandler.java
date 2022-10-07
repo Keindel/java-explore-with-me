@@ -17,11 +17,12 @@ public class ErrorHandler {
     private static final String NOT_FOUND = "The required object was not found.";
 
 
-    @ExceptionHandler({UserNotFoundException.class,
-            CategoryNotFoundException.class,
+    @ExceptionHandler({CategoryNotFoundException.class,
             CompilationNotFoundException.class,
             EventNotFoundException.class,
-            LocationNotFoundException.class})
+            LocationNotFoundException.class,
+            ParticipationRequestNotFoundException.class,
+            UserNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError handleNotFound(final Exception e) {
         return new ApiError(e.getStackTrace(),

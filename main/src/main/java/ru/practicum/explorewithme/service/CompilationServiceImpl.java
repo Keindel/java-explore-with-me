@@ -26,7 +26,7 @@ public class CompilationServiceImpl implements CompilationService {
     public List<Compilation> getCompilations(Boolean pinned, Integer from, Integer size) {
         Pageable page = CustomPageable.of(from, size);
         if (pinned != null) {
-            return compilationRepository.findAllByPinned(page).getContent();
+            return compilationRepository.findAllByPinned(pinned, page).getContent();
         }
         return compilationRepository.findAll(page).getContent();
     }

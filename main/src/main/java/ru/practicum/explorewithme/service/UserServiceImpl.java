@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
                 && newParticipantLimit < participationRequestRepository.findAllByStatusAndEvent(Status.CONFIRMED, event).size()) {
             throw new RequestLogicException("new request limit can't be less than current number of confirmed requests");
         }
-        Event eventUpdate = eventMapper.mapToEvent(updateEventRequest, updateEventRequest.getEventId());
+        Event eventUpdate = eventMapper.mapFromUpdateToEvent(updateEventRequest, event);
         eventUpdate.setState(State.PENDING);
         return eventRepository.save(eventUpdate);
     }
@@ -190,7 +190,8 @@ public class UserServiceImpl implements UserService {
             throw new RequestLogicException("Cant request not published event");
         }
         // если у события достигнут лимит запросов на участие - необходимо вернуть ошибку
-        if (participationRequestRepository.findAllByStatusAndEvent(Status.CONFIRMED, event).size()
+//        if (participationRequestRepository.findAllByStatusAndEvent(Status.CONFIRMED, event).size()
+        if (participationRequestRepository.countByStatusAndEvent(Status.CONFIRMED, event)
                 >= event.getParticipantLimit()
                 && event.getParticipantLimit() != 0) {
             throw new RequestLogicException("Requests limit is reached");

@@ -26,7 +26,7 @@ public interface EventsApi {
     @RequestMapping(value = "/events/{id}",
             produces = {"application/json"},
             method = RequestMethod.GET)
-    ResponseEntity<EventFullDto> getEventById(@PathVariable("id") Long id) throws EventNotFoundException;
+    ResponseEntity<EventFullDto> getEventById(@PathVariable("id") Long id) throws EventNotFoundException, EventTimeException;
 
     @RequestMapping(value = "/events",
             produces = {"application/json"},

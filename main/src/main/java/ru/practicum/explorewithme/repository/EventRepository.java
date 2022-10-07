@@ -30,6 +30,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     Optional<Event> findByIdAndPublishedOnIsNotNull(Long id);
 
+
     /*
      * это публичный эндпоинт, соответственно в выдаче должны быть только опубликованные события
      * текстовый поиск (по аннотации и подробному описанию) должен быть без учета регистра букв
@@ -41,20 +42,24 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 //    Boolean onlyAvailable,
 //    String stringSort,
 //    Integer from, Integer size
-
     String confirmedRequestsCount = "(SELECT COUNT(part_req) FROM ParticipationRequest part_req " +
             "WHERE part_req.event = ev AND part_req.status = 'CONFIRMED')";
 
     //TODO JPA Criteria API
-    @Query("SELECT ev FROM Event ev " +
-            "WHERE (LOWER(ev.annotation) LIKE LOWER(CONCAT('%', :text, '%') ) " +
-            "OR LOWER(ev.description) LIKE LOWER(concat('%', :text, '%') )) " +
-            "AND (:categories IS NULL OR ev.category.id IN :categories) " +
-            "AND (:paid IS NULL OR ev.paid = :paid) " +
-            "AND (ev.eventDate BETWEEN :rangeStart AND :rangeEnd) " +
-            "AND (:onlyAvailable IS NULL OR :onlyAvailable IS FALSE OR " +
-            "ev.participantLimit = 0 OR " +
-            "(ev.participantLimit < " + confirmedRequestsCount + " )) " +
-            "ORDER BY ")
-    Page<Event> findAllByAnnotationContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndPublishedOnIsNotNullAndEventDateIsBetween();
+//    @Query("SELECT ev FROM Event ev " +
+//            "WHERE (LOWER(ev.annotation) LIKE LOWER(CONCAT('%', :text, '%') ) " +
+//            "OR LOWER(ev.description) LIKE LOWER(concat('%', :text, '%') )) " +
+//            "AND (:categories IS NULL OR ev.category.id IN :categories) " +
+//            "AND (:paid IS NULL OR ev.paid = :paid) " +
+//            "AND (ev.eventDate BETWEEN :rangeStart AND :rangeEnd) " +
+//            "AND (:onlyAvailable IS NULL OR :onlyAvailable IS FALSE OR " +
+//            "ev.participantLimit = 0 OR " +
+//            "(ev.participantLimit < " + confirmedRequestsCount + " )) " +
+//            "ORDER BY ")
+//    Page<Event> findAllByPublicParams(String text,
+//                                      List<Long> categories,
+//                                      Boolean paid,LocalDateTime rangeStart,LocalDateTime rangeEnd,
+//                                      Boolean onlyAvailable,
+//                                      String stringSort,
+//                                      Pageable page);
 }

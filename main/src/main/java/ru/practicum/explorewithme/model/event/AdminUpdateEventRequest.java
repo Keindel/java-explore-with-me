@@ -1,8 +1,12 @@
-package ru.practicum.explorewithme.model;
+package ru.practicum.explorewithme.model.event;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 import ru.practicum.explorewithme.model.location.Location;
+
+import javax.validation.constraints.Min;
+import java.time.LocalDateTime;
 
 /**
  * Информация для редактирования события администратором. Все поля необязательные. Значение полей не валидируется.
@@ -22,12 +26,14 @@ public class AdminUpdateEventRequest   {
 
   private String description;
 
-  private String eventDate;
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  private LocalDateTime eventDate;
 
   private Location location;
 
   private Boolean paid;
 
+  @Min(0)
   private Integer participantLimit;
 
   private Boolean requestModeration;

@@ -5,9 +5,11 @@ import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import ru.practicum.explorewithme.exceptions.notfound.CategoryNotFoundException;
+import ru.practicum.explorewithme.model.event.AdminUpdateEventRequest;
 import ru.practicum.explorewithme.model.category.Category;
 import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.NewEventDto;
+import ru.practicum.explorewithme.model.event.UpdateEventRequest;
 import ru.practicum.explorewithme.repository.CategoryRepository;
 
 @Component
@@ -18,11 +20,13 @@ public class EventMapper {
 
     private final CategoryRepository categoryRepository;
 
-//    public EventFullDto mapToFullDto(Event event) {
-//        modelMapper.typeMap(Event.class, EventFullDto.class).addMappings(m
-//                -> m.using(convertLongToCat).map(Event::getCategory, EventFullDto::setCategory));
-//        return modelMapper.map(event, EventFullDto.class);
-//    }
+    private Converter<Long, Category> convertLongToCat = src -> {
+        try {
+            return src.getSource() == null ? null : this.findCategory(src.getSource());
+        } catch (CategoryNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    };
 
     public <T> Event mapToEvent(T eventSomeDto, Long id) {
         modelMapper.typeMap(NewEventDto.class, Event.class).addMappings(m
@@ -31,16 +35,17 @@ public class EventMapper {
         if (id != null) {
             event.setId(id);
         }
-        return modelMapper.map(eventSomeDto, Event.class);
+        return event;
     }
 
-    private Converter<Long, Category> convertLongToCat = src -> {
-        try {
-            return src.getSource() == null ? null : EventMapper.this.findCategory(src.getSource());
-        } catch (CategoryNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    };
+    public <T> Event mapFromUpdateToEvent(T eventSomeDto, Event event) {
+        modelMapper.typeMap(UpdateEventRequest.class, Event.class).addMappings(m
+                -> m.using(convertLongToCat).map(UpdateEventRequest::getCategory, Event::setCategory));
+        modelMapper.typeMap(AdminUpdateEventRequest.class, Event.class).addMappings(m
+                -> m.using(convertLongToCat).map(AdminUpdateEventRequest::getCategory, Event::setCategory));
+        modelMapper.map(eventSomeDto, event);
+        return event;
+    }
 
     private Category findCategory(Long catId) throws CategoryNotFoundException {
         return categoryRepository.findById(catId).orElseThrow(() -> new CategoryNotFoundException(catId));

@@ -6,8 +6,11 @@
 package ru.practicum.explorewithme.api;
 
 import ru.practicum.explorewithme.exceptions.EventTimeException;
+import ru.practicum.explorewithme.exceptions.ForbiddenException;
+import ru.practicum.explorewithme.exceptions.RequestLogicException;
+import ru.practicum.explorewithme.exceptions.notfound.CompilationNotFoundException;
 import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
-import ru.practicum.explorewithme.model.AdminUpdateEventRequest;
+import ru.practicum.explorewithme.model.event.AdminUpdateEventRequest;
 import ru.practicum.explorewithme.model.category.CategoryDto;
 import ru.practicum.explorewithme.model.compilation.CompilationDto;
 import ru.practicum.explorewithme.model.event.EventFullDto;
@@ -82,17 +85,17 @@ public interface AdminApi {
             consumes = { "application/json" },
             method = RequestMethod.PUT)
     ResponseEntity<EventFullDto> updateEvent(@PathVariable("eventId") Long eventId,
-                                             @Valid @RequestBody AdminUpdateEventRequest body);
+                                             @Valid @RequestBody AdminUpdateEventRequest body) throws RequestLogicException, EventNotFoundException;
 
     @RequestMapping(value = "/admin/events/{eventId}/publish",
             produces = { "application/json" },
             method = RequestMethod.PATCH)
-    ResponseEntity<EventFullDto> publishEvent(@PathVariable("eventId") Long eventId);
+    ResponseEntity<EventFullDto> publishEvent(@PathVariable("eventId") Long eventId) throws EventTimeException, ForbiddenException, EventNotFoundException;
 
     @RequestMapping(value = "/admin/events/{eventId}/reject",
             produces = { "application/json" },
             method = RequestMethod.PATCH)
-    ResponseEntity<EventFullDto> rejectEvent(@PathVariable("eventId") Long eventId);
+    ResponseEntity<EventFullDto> rejectEvent(@PathVariable("eventId") Long eventId) throws ForbiddenException, EventNotFoundException;
 
     @RequestMapping(value = "/admin/compilations",
             produces = { "application/json" },
@@ -109,22 +112,22 @@ public interface AdminApi {
             produces = { "application/json" },
             method = RequestMethod.DELETE)
     ResponseEntity<Void> removeEventFromCompilation(@PathVariable("eventId") Long eventId,
-                                                    @PathVariable Long compId);
+                                                    @PathVariable Long compId) throws CompilationNotFoundException, EventNotFoundException;
 
     @RequestMapping(value = "/admin/compilations/{compId}/events/{eventId}",
         produces = { "application/json" }, 
         method = RequestMethod.PATCH)
     ResponseEntity<Void> addEventToCompilation(@PathVariable("compId") Long compId,
-                                               @PathVariable("eventId") Long eventId);
+                                               @PathVariable("eventId") Long eventId) throws CompilationNotFoundException, EventNotFoundException;
 
     @RequestMapping(value = "/admin/compilations/{compId}/pin",
             produces = { "application/json" },
             method = RequestMethod.DELETE)
-    ResponseEntity<Void> unpinCompilation(@PathVariable("compId") Long compId);
+    ResponseEntity<Void> unpinCompilation(@PathVariable("compId") Long compId) throws CompilationNotFoundException;
 
     @RequestMapping(value = "/admin/compilations/{compId}/pin",
         produces = { "application/json" }, 
         method = RequestMethod.PATCH)
-    ResponseEntity<Void> pinCompilation(@PathVariable("compId") Long compId);
+    ResponseEntity<Void> pinCompilation(@PathVariable("compId") Long compId) throws CompilationNotFoundException;
 }
 

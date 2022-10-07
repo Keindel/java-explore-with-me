@@ -15,10 +15,17 @@ public interface ParticipationRequestRepository extends JpaRepository<Participat
 
     List<ParticipationRequest> findAllByStatusAndEvent(Status status, Event event);
 
+    //TODO CHECK
     @Query("SELECT COUNT(req) FROM ParticipationRequest req " +
             "WHERE req.event = :event " +
             "AND req.status = :status ")
     Long countByStatusAndEvent(Status status, Event event);
+//    @Query("SELECT COUNT(req) AS reqCount " +
+//            "FROM ParticipationRequest req " +
+//            "WHERE req.event = :event " +
+//            "AND req.status = :status ")
+//////    List<ReqCount> countByStatusAndEvent(Status status, Event event);
+//    ReqCount countByStatusAndEvent(Status status, Event event);
 
     List<ParticipationRequest> findAllByRequester(User user);
 }

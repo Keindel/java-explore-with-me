@@ -11,7 +11,7 @@ import ru.practicum.explorewithme.exceptions.RequestLogicException;
 import ru.practicum.explorewithme.exceptions.notfound.CompilationNotFoundException;
 import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
 import ru.practicum.explorewithme.mapper.EventMapper;
-import ru.practicum.explorewithme.model.AdminUpdateEventRequest;
+import ru.practicum.explorewithme.model.event.AdminUpdateEventRequest;
 import ru.practicum.explorewithme.model.category.Category;
 import ru.practicum.explorewithme.model.category.CategoryDto;
 import ru.practicum.explorewithme.model.category.NewCategoryDto;
@@ -95,6 +95,7 @@ public class AdminServiceImpl implements AdminService {
         if (rangeStart.isAfter(rangeEnd)) {
             throw new EventTimeException("start must be before end");
         }
+
         return eventRepository.findAllByParams(users, states, categories, rangeStart, rangeEnd, page).getContent();
     }
 
@@ -103,13 +104,15 @@ public class AdminServiceImpl implements AdminService {
             throws EventNotFoundException, RequestLogicException {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
         Integer newParticipantLimit = adminUpdateEventRequest.getParticipantLimit();
+//            Long checkNumber = participationRequestRepository.countByStatusAndEvent(Status.CONFIRMED, event);
         if (newParticipantLimit != null
 //                && newParticipantLimit < participationRequestRepository.findAllByStatusAndEvent(Status.CONFIRMED, event).size()) {
+                && newParticipantLimit != 0
                 //TODO check
                 && newParticipantLimit < participationRequestRepository.countByStatusAndEvent(Status.CONFIRMED, event)) {
             throw new RequestLogicException("new request limit can't be less than current number of confirmed requests");
         }
-        Event eventUpdate = eventMapper.mapToEvent(adminUpdateEventRequest, eventId);
+        Event eventUpdate = eventMapper.mapFromUpdateToEvent(adminUpdateEventRequest, event);
         return eventRepository.save(eventUpdate);
     }
 
@@ -124,6 +127,7 @@ public class AdminServiceImpl implements AdminService {
             throw new EventTimeException("cant publish event with start within an hour");
         }
         event.setState(State.PUBLISHED);
+        event.setPublishedOn(LocalDateTime.now());
         return eventRepository.save(event);
     }
 
