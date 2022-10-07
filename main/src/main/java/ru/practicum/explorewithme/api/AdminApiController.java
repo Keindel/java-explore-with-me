@@ -10,6 +10,7 @@ import ru.practicum.explorewithme.exceptions.ForbiddenException;
 import ru.practicum.explorewithme.exceptions.RequestLogicException;
 import ru.practicum.explorewithme.exceptions.notfound.CompilationNotFoundException;
 import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
+import ru.practicum.explorewithme.mapper.CompilationMapper;
 import ru.practicum.explorewithme.mapper.EventMapper;
 import ru.practicum.explorewithme.model.event.AdminUpdateEventRequest;
 import ru.practicum.explorewithme.model.category.CategoryDto;
@@ -39,6 +40,8 @@ public class AdminApiController implements AdminApi {
     private final ModelMapper modelMapper;
 
     private final EventMapper eventMapper;
+
+    private final CompilationMapper compilationMapper;
 
     private final ListModelMapper listModelMapper;
 
@@ -124,8 +127,7 @@ public class AdminApiController implements AdminApi {
     @PostMapping("/compilations")
     public ResponseEntity<CompilationDto> saveCompilation(@Valid @RequestBody NewCompilationDto newCompilationDto)
             throws EventNotFoundException {
-        return new ResponseEntity<>(modelMapper.map(adminService.saveCompilation(newCompilationDto),
-                CompilationDto.class),
+        return new ResponseEntity<>(compilationMapper.mapToDto(adminService.saveCompilation(newCompilationDto)),
                 HttpStatus.OK);
     }
 

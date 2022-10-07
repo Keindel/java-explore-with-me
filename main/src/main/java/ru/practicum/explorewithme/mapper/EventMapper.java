@@ -64,7 +64,9 @@ public class EventMapper {
 
     public EventShortDto mapToShortDto(Event event) {
         EventShortDto eventShortDto = modelMapper.map(event, EventShortDto.class);
-        if (Boolean.FALSE.equals(event.getRequestModeration())) {
+        if (Boolean.FALSE.equals(event.getRequestModeration())
+                || event.getParticipantLimit() == 0) {
+            // в этих случаях подтверждение реквеста не требуется, поэтому считаем все реквесты
             eventShortDto.setConfirmedRequests(requestRepository.countPendingAndConfirmedByEvent(event));
         } else {
             eventShortDto.setConfirmedRequests(requestRepository.countByStatusAndEvent(Status.CONFIRMED, event));

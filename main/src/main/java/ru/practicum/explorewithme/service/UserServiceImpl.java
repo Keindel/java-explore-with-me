@@ -57,6 +57,18 @@ public class UserServiceImpl implements UserService {
         Long eventId = updateEventRequest.getEventId();
         Event event = eventRepository.findById(eventId).orElseThrow(()
                 -> new EventNotFoundException(eventId));
+        validateUpdateEvent(userId, event);
+        Integer newParticipantLimit = updateEventRequest.getParticipantLimit();
+        if (newParticipantLimit != null
+                && newParticipantLimit < participationRequestRepository.findAllByStatusAndEvent(Status.CONFIRMED, event).size()) {
+            throw new RequestLogicException("new request limit can't be less than current number of confirmed requests");
+        }
+        Event eventUpdate = eventMapper.mapFromUpdateToEvent(updateEventRequest, event);
+        eventUpdate.setState(State.PENDING);
+        return eventRepository.save(eventUpdate);
+    }
+
+    private static void validateUpdateEvent(Long userId, Event event) throws ForbiddenException {
         if (!Objects.equals(event.getInitiator().getId(), userId)) {
             throw new ForbiddenException("no access rights for current user");
         }
@@ -68,14 +80,6 @@ public class UserServiceImpl implements UserService {
         if (eventState == State.PUBLISHED) {
             throw new ForbiddenException("event state forbids further changes");
         }
-        Integer newParticipantLimit = updateEventRequest.getParticipantLimit();
-        if (newParticipantLimit != null
-                && newParticipantLimit < participationRequestRepository.findAllByStatusAndEvent(Status.CONFIRMED, event).size()) {
-            throw new RequestLogicException("new request limit can't be less than current number of confirmed requests");
-        }
-        Event eventUpdate = eventMapper.mapFromUpdateToEvent(updateEventRequest, event);
-        eventUpdate.setState(State.PENDING);
-        return eventRepository.save(eventUpdate);
     }
 
     @Override
@@ -182,6 +186,19 @@ public class UserServiceImpl implements UserService {
         // нельзя добавить повторный запрос - реализовано на уровне БД как UNIQUE(user_id, event_id)
         User currentUser = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
+        validateParticipationRequest(currentUser, event);
+        Status status = Status.PENDING;
+        // если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного
+        if (Boolean.FALSE.equals(event.getRequestModeration())) {
+            status = Status.CONFIRMED;
+        }
+        ParticipationRequest participationRequest = new ParticipationRequest(LocalDateTime.now(),
+                event, null, currentUser, status);
+
+        return participationRequestRepository.save(participationRequest);
+    }
+
+    private void validateParticipationRequest(User currentUser, Event event) throws RequestLogicException {
         // инициатор события не может добавить запрос на участие в своём событии
         if (event.getInitiator().equals(currentUser)) {
             throw new RequestLogicException("Initiator cant request");
@@ -197,15 +214,6 @@ public class UserServiceImpl implements UserService {
                 && event.getParticipantLimit() != 0) {
             throw new RequestLogicException("Requests limit is reached");
         }
-        Status status = Status.PENDING;
-        // если для события отключена пре-модерация запросов на участие, то запрос должен автоматически перейти в состояние подтвержденного
-        if (Boolean.FALSE.equals(event.getRequestModeration())) {
-            status = Status.CONFIRMED;
-        }
-        ParticipationRequest participationRequest = new ParticipationRequest(LocalDateTime.now(),
-                event, null, currentUser, status);
-
-        return participationRequestRepository.save(participationRequest);
     }
 
     @Override
