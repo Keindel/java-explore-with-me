@@ -16,4 +16,11 @@ public interface EventRepositoryCustom {
                                 LocalDateTime rangeStart,
                                 LocalDateTime rangeEnd,
                                 Pageable page);
+
+    Page<Event> findAllByPublicParamsCustom(String text,
+                                                   List<Long> categories,
+                                                   Boolean paid,
+                                                   LocalDateTime rangeStart, LocalDateTime rangeEnd,
+                                                   Boolean onlyAvailable,
+                                                   Pageable page);
 }

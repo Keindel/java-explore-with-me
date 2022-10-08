@@ -13,12 +13,14 @@ import ru.practicum.explorewithme.model.EndpointHit;
 import ru.practicum.explorewithme.model.ViewStats;
 import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.EventFullDto;
+import ru.practicum.explorewithme.model.event.EventShortDto;
 import ru.practicum.explorewithme.repository.CategoryRepository;
 import ru.practicum.explorewithme.repository.EventRepository;
 import ru.practicum.explorewithme.util.CustomPageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,47 +37,56 @@ public class EventServiceImpl implements EventService {
     private final EventMapper eventMapper;
 
     @Override
-    public List<Event> getEventsShort(String text,
-                                      List<Long> categories,
-                                      Boolean paid,
-                                      LocalDateTime rangeStart, LocalDateTime rangeEnd,
-                                      Boolean onlyAvailable,
-                                      String stringSort,
-                                      Integer from, Integer size) throws EventTimeException {
+    public List<EventShortDto> getEventsShort(String text,
+                                              List<Long> categories,
+                                              Boolean paid,
+                                              LocalDateTime rangeStart, LocalDateTime rangeEnd,
+                                              Boolean onlyAvailable,
+                                              String stringSort,
+                                              Integer from, Integer size) throws EventTimeException {
 
         //TODO STATS - HOW ???
         /*
          * информация о каждом событии должна включать в себя количество просмотров и количество уже одобренных заявок на участие
          * информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики
          * */
-        /*
-        * это публичный эндпоинт, соответственно в выдаче должны быть только опубликованные события
-        * текстовый поиск (по аннотации и подробному описанию) должен быть без учета регистра букв
-        * */
         rangeStart = (rangeStart == null ? LocalDateTime.now() : rangeStart);
-        rangeEnd = (rangeEnd == null ? LocalDateTime.MAX :rangeEnd);
+        rangeEnd = (rangeEnd == null ? LocalDateTime.MAX : rangeEnd);
         if (rangeStart.isAfter(rangeEnd)) {
             throw new EventTimeException("start must be before end");
         }
-        Sort sort = Sort.sort(Event.class).by(Event::getEventDate).descending();
-        Pageable page = CustomPageable.of(from, size, sort);
 
-        //TODO
-//        postEventsHitToStats();
-
+        List<Event> eventList;
+        Sort sort;
+        Pageable page;
         switch (stringSort) {
             case "EVENT_DATE":
+                sort = Sort.sort(Event.class).by(Event::getEventDate).descending();
+                page = CustomPageable.of(from, size, sort);
+                eventList = eventRepository.findAllByPublicParamsCustom(text,
+                        categories,
+                        paid,
+                        rangeStart, rangeEnd,
+                        onlyAvailable, page).getContent();
                 break;
             case "VIEWS":
+                page = CustomPageable.of(from, size);
+                eventList = eventRepository.findAllByPublicParamsCustom(text,
+                        categories,
+                        paid,
+                        rangeStart, rangeEnd,
+                        onlyAvailable, page).getContent();
+                sort = Sort.sort(EventShortDto.class).by(EventShortDto::getViews).descending();
                 break;
             default:
                 throw new IllegalArgumentException(stringSort + " - not supported");
         }
-        return eventRepository.findAllByPublicParams(text,
-                categories,
-                paid,
-                rangeStart, rangeEnd,
-                onlyAvailable, page).getContent();
+
+
+        //TODO
+//        postEventsHitToStats();
+
+        return null;
     }
 
     //TODO перенести POST Hit в контроллер?

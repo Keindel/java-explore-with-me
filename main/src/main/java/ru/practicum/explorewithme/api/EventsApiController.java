@@ -24,8 +24,6 @@ import java.util.stream.Collectors;
 @RequestMapping(path = "/events")
 public class EventsApiController implements EventsApi {
 
-    private final EventMapper eventMapper;
-
     private final EventService eventService;
 
     @GetMapping
@@ -37,13 +35,12 @@ public class EventsApiController implements EventsApi {
                                                               @Valid @RequestParam(value = "rangeEnd", required = false)
                                                               @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
                                                               @Valid @RequestParam(value = "onlyAvailable", required = false, defaultValue = "false") Boolean onlyAvailable,
-                                                              @Valid @RequestParam(value = "sort", required = false) String stringSort,
+                                                              @Valid @RequestParam(value = "sort", required = false, defaultValue = "EVENT_DATE") String stringSort,
                                                               @Valid @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
                                                               @Valid @RequestParam(value = "size", required = false, defaultValue = "10") Integer size)
             throws EventTimeException {
         return new ResponseEntity<>(eventService
-                .getEventsShort(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, stringSort, from, size)
-                .stream().map(eventMapper::mapToShortDto).collect(Collectors.toList()),
+                .getEventsShort(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, stringSort, from, size),
                 HttpStatus.OK);
     }
 
