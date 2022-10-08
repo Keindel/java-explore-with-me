@@ -1,8 +1,7 @@
-package ru.practicum.explorewithme.api;
+package ru.practicum.explorewithme.api.forpublic;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.explorewithme.exceptions.notfound.CompilationNotFoundException;
 import ru.practicum.explorewithme.mapper.CompilationMapper;
@@ -10,7 +9,6 @@ import ru.practicum.explorewithme.model.compilation.CompilationDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import ru.practicum.explorewithme.service.CompilationService;
-import ru.practicum.explorewithme.mapper.ListModelMapper;
 
 import javax.validation.Valid;
 import java.util.List;

@@ -1,4 +1,4 @@
-package ru.practicum.explorewithme.api;
+package ru.practicum.explorewithme.api.foradmin;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

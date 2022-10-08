@@ -19,6 +19,7 @@ import ru.practicum.explorewithme.repository.EventRepository;
 import ru.practicum.explorewithme.util.CustomPageable;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,7 +46,8 @@ public class EventServiceImpl implements EventService {
                                               String stringSort,
                                               Integer from, Integer size) throws EventTimeException {
 
-        //TODO STATS - HOW ???
+        //TODO
+        // postEventsHitToStats();
         /*
          * информация о каждом событии должна включать в себя количество просмотров и количество уже одобренных заявок на участие
          * информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики
@@ -76,17 +78,26 @@ public class EventServiceImpl implements EventService {
                         paid,
                         rangeStart, rangeEnd,
                         onlyAvailable, page).getContent();
-                sort = Sort.sort(EventShortDto.class).by(EventShortDto::getViews).descending();
                 break;
             default:
                 throw new IllegalArgumentException(stringSort + " - not supported");
         }
+        List<EventShortDto> eventShortDtoList = eventList.stream()
+                .map(eventMapper::mapToShortDto).collect(Collectors.toList());
 
+        // TODO getEventViewsById(Long id)
+        eventShortDtoList.forEach(eventShortDto -> eventShortDto.setViews(getEventViewsById(eventShortDto.getId())));
 
-        //TODO
-//        postEventsHitToStats();
+        //TODO STATS - get
 
-        return null;
+        if (page.getSort().isUnsorted()) {
+            eventShortDtoList = eventShortDtoList.stream()
+                    .sorted(Comparator.comparingLong(EventShortDto::getViews).reversed())
+                    .skip(from)
+                    .limit(size)
+                    .collect(Collectors.toList());
+        }
+        return eventShortDtoList;
     }
 
     //TODO перенести POST Hit в контроллер?
@@ -112,7 +123,7 @@ public class EventServiceImpl implements EventService {
 
         //информация о событии должна включать в себя количество просмотров и количество подтвержденных запросов
 
-        /*postEventIdHitToStats(id);
+        postEventIdHitToStats(id);
         //TODO
         Long views = statsClient.get()
                 .uri("/stats?start={start}&end={end}&uris={uris}&unique={unique}")
@@ -120,9 +131,9 @@ public class EventServiceImpl implements EventService {
                 .bodyToMono(ViewStats.class)
                 .block()
                 .getHits();
-*/
+
         EventFullDto eventFullDto = eventMapper.mapToFullDto(event);
-//        eventFullDto.setViews(views);
+        eventFullDto.setViews(views);
         return eventFullDto;
     }
 }

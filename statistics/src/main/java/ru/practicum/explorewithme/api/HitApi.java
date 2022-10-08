@@ -5,12 +5,6 @@
  */
 package ru.practicum.explorewithme.api;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,17 +14,13 @@ import ru.practicum.explorewithme.model.EndpointHit;
 
 import javax.validation.Valid;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2022-09-22T10:27:11.783Z[GMT]")
 @Validated
 public interface HitApi {
 
-    @Operation(summary = "Сохранение информации о том, что к эндпоинту был запрос", description = "Сохранение информации о том, что на uri конкретного сервиса был отправлен запрос пользователем. Название сервиса, uri и ip пользователя указаны в теле запроса.", tags={ "StatsController" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Информация сохранена") })
     @RequestMapping(value = "/hit",
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<Void> hit(@Parameter(in = ParameterIn.DEFAULT, description = "данные запроса", required=true, schema=@Schema()) @Valid @RequestBody EndpointHit body);
+    ResponseEntity<Void> hit(@Valid @RequestBody EndpointHit body);
 
 }
 

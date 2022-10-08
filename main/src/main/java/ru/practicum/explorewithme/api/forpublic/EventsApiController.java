@@ -1,4 +1,4 @@
-package ru.practicum.explorewithme.api;
+package ru.practicum.explorewithme.api.forpublic;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.explorewithme.exceptions.EventTimeException;
 import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
-import ru.practicum.explorewithme.mapper.EventMapper;
 import ru.practicum.explorewithme.model.event.EventFullDto;
 import ru.practicum.explorewithme.model.event.EventShortDto;
 import ru.practicum.explorewithme.service.EventService;
@@ -16,7 +15,6 @@ import ru.practicum.explorewithme.service.EventService;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController

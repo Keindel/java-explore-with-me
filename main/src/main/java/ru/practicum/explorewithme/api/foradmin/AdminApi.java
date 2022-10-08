@@ -3,7 +3,7 @@
  * https://github.com/swagger-api/swagger-codegen
  * Do not edit the class manually.
  */
-package ru.practicum.explorewithme.api;
+package ru.practicum.explorewithme.api.foradmin;
 
 import ru.practicum.explorewithme.exceptions.EventTimeException;
 import ru.practicum.explorewithme.exceptions.ForbiddenException;
