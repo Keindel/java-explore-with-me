@@ -31,26 +31,34 @@ public class ErrorHandler {
                 ApiError.StatusEnum._404_NOT_FOUND,
                 LocalDateTime.now());
     }
-//
-//    @ExceptionHandler({BookingValidationException.class})
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public Map<String, String> handleBadRequest(final Exception e) {
-//        return Map.of("error: ", "check your request");
-//    }
-//
-//    @ExceptionHandler({UnsupportedStateException.class})
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public ErrorResponse handleUnsupported(final Exception e) {
-//        return new ErrorResponse(e.getMessage());
-//    }
 
     @ExceptionHandler({EventTimeException.class})
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handleBadEvent(final Exception e) {
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleEventBadTime(final Exception e) {
+        return new ApiError(e.getStackTrace(),
+                e.getMessage(),
+                CONDITIONS_NOT_MET,
+                ApiError.StatusEnum._409_CONFLICT,
+                LocalDateTime.now());
+    }
+
+    @ExceptionHandler({ForbiddenException.class})
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ApiError handleForbidden(final Exception e) {
         return new ApiError(e.getStackTrace(),
                 e.getMessage(),
                 CONDITIONS_NOT_MET,
                 ApiError.StatusEnum._403_FORBIDDEN,
+                LocalDateTime.now());
+    }
+
+    @ExceptionHandler({IllegalArgumentException.class})
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    public ApiError handleIllegalArgument(final Exception e) {
+        return new ApiError(e.getStackTrace(),
+                e.getMessage(),
+                CONDITIONS_NOT_MET,
+                ApiError.StatusEnum._406_NOT_ACCEPTABLE,
                 LocalDateTime.now());
     }
 }
