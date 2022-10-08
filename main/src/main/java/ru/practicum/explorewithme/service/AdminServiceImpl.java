@@ -96,7 +96,7 @@ public class AdminServiceImpl implements AdminService {
             throw new EventTimeException("start must be before end");
         }
 
-        return eventRepository.findAllByParams(users, states, categories, rangeStart, rangeEnd, page).getContent();
+        return eventRepository.findAllByParamsCustom(users, states, categories, rangeStart, rangeEnd, page).getContent();
     }
 
     @Override

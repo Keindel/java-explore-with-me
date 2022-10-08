@@ -61,7 +61,7 @@ public class EventServiceImpl implements EventService {
         Pageable page = CustomPageable.of(from, size, sort);
 
         //TODO
-        postEventsHitToStats();
+//        postEventsHitToStats();
 
         switch (stringSort) {
             case "EVENT_DATE":
@@ -71,7 +71,11 @@ public class EventServiceImpl implements EventService {
             default:
                 throw new IllegalArgumentException(stringSort + " - not supported");
         }
-        return null;//eventRepository.findAllBy;
+        return eventRepository.findAllByPublicParams(text,
+                categories,
+                paid,
+                rangeStart, rangeEnd,
+                onlyAvailable, page).getContent();
     }
 
     //TODO перенести POST Hit в контроллер?
