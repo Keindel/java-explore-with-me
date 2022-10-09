@@ -8,8 +8,6 @@ import java.util.List;
 
 public interface StatisticsService {
 
-    ViewStats getViewStats();
-
     List<ViewStats> getViewStatsList(LocalDateTime start,
                                      LocalDateTime end,
                                      List<String> uris,

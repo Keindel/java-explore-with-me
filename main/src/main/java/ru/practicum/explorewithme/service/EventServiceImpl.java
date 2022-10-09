@@ -10,6 +10,7 @@ import ru.practicum.explorewithme.exceptions.EventTimeException;
 import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
 import ru.practicum.explorewithme.mapper.EventMapper;
 import ru.practicum.explorewithme.model.EndpointHit;
+import ru.practicum.explorewithme.model.ViewStats;
 import ru.practicum.explorewithme.model.ViewStatsDto;
 import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.EventFullDto;
@@ -30,11 +31,7 @@ public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
 
-    private final CategoryRepository categoryRepository;
-
     private final WebClient statsClient = WebClient.create("${statistics-server.url}");
-
-    private final ModelMapper modelMapper;
 
     private final EventMapper eventMapper;
 
@@ -88,7 +85,7 @@ public class EventServiceImpl implements EventService {
                 .map(eventMapper::mapToShortDto).collect(Collectors.toList());
 
         // TODO getEventViewsById(Long id)
-        eventShortDtoList.forEach(eventShortDto -> eventShortDto.setViews(getEventViewsById(eventShortDto.getId())));
+//        eventShortDtoList.forEach(eventShortDto -> eventShortDto.setViews(getEventViewsById(eventShortDto.getId())));
 
         //TODO STATS - get
         //   "/stats?start={start}&end={end}&uris={uris}&unique={unique}")
@@ -124,11 +121,11 @@ public class EventServiceImpl implements EventService {
         //TODO
         Long views = statsClient.get()
                 .uri(uriBuilder -> uriBuilder.path("/stats")
-                        .queryParam("uris", httpServletRequest.getRequestURI())
+                        .queryParam("uris", List.of(httpServletRequest.getRequestURI()))
                         .build())
                 .retrieve()
-                .bodyToMono(ViewStatsDto.class)
-                .block()
+                .bodyToFlux(ViewStats.class)
+                .blockFirst()
                 .getHits();
 
         EventFullDto eventFullDto = eventMapper.mapToFullDto(event);

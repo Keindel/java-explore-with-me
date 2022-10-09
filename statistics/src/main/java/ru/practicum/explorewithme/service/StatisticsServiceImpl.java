@@ -16,16 +16,11 @@ public class StatisticsServiceImpl implements StatisticsService {
     private final EndpointHitRepository repository;
 
     @Override
-    public ViewStats getViewStats() {
-        return null;
-    }
-
-    @Override
     public List<ViewStats> getViewStatsList(LocalDateTime start,
                                             LocalDateTime end,
                                             List<String> uris,
                                             Boolean unique) {
-        return repository.findAll();
+        return repository.getViewStatsListByParams(start, end, uris, unique);
     }
 
     @Override
