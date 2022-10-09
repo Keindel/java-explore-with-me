@@ -20,7 +20,7 @@ public interface HitApi {
     @RequestMapping(value = "/hit",
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<Void> hit(@Valid @RequestBody EndpointHit body);
+    ResponseEntity<EndpointHit> hit(@Valid @RequestBody EndpointHit body);
 
 }
 

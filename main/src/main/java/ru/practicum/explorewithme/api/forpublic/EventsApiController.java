@@ -12,6 +12,7 @@ import ru.practicum.explorewithme.model.event.EventFullDto;
 import ru.practicum.explorewithme.model.event.EventShortDto;
 import ru.practicum.explorewithme.service.EventService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,17 +36,23 @@ public class EventsApiController implements EventsApi {
                                                               @Valid @RequestParam(value = "onlyAvailable", required = false, defaultValue = "false") Boolean onlyAvailable,
                                                               @Valid @RequestParam(value = "sort", required = false, defaultValue = "EVENT_DATE") String stringSort,
                                                               @Valid @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
-                                                              @Valid @RequestParam(value = "size", required = false, defaultValue = "10") Integer size)
+                                                              @Valid @RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
+                                                              HttpServletRequest httpServletRequest)
             throws EventTimeException {
         return new ResponseEntity<>(eventService
-                .getEventsShort(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, stringSort, from, size),
+                .getEventsShort(text, categories, paid,
+                        rangeStart, rangeEnd,
+                        onlyAvailable, stringSort,
+                        from, size,
+                        httpServletRequest),
                 HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EventFullDto> getEventById(@PathVariable("id") Long id)
+    public ResponseEntity<EventFullDto> getEventById(@PathVariable("id") Long id,
+                                                     HttpServletRequest httpServletRequest)
             throws EventNotFoundException, EventTimeException {
-        return new ResponseEntity<>(eventService.getEventById(id),
+        return new ResponseEntity<>(eventService.getEventById(id, httpServletRequest),
                 HttpStatus.OK);
     }
 }

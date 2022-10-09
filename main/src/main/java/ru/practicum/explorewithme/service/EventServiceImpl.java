@@ -10,7 +10,7 @@ import ru.practicum.explorewithme.exceptions.EventTimeException;
 import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
 import ru.practicum.explorewithme.mapper.EventMapper;
 import ru.practicum.explorewithme.model.EndpointHit;
-import ru.practicum.explorewithme.model.ViewStats;
+import ru.practicum.explorewithme.model.ViewStatsDto;
 import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.EventFullDto;
 import ru.practicum.explorewithme.model.event.EventShortDto;
@@ -18,6 +18,7 @@ import ru.practicum.explorewithme.repository.CategoryRepository;
 import ru.practicum.explorewithme.repository.EventRepository;
 import ru.practicum.explorewithme.util.CustomPageable;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -44,7 +45,8 @@ public class EventServiceImpl implements EventService {
                                               LocalDateTime rangeStart, LocalDateTime rangeEnd,
                                               Boolean onlyAvailable,
                                               String stringSort,
-                                              Integer from, Integer size) throws EventTimeException {
+                                              Integer from, Integer size,
+                                              HttpServletRequest httpServletRequest) throws EventTimeException {
 
         //TODO
         // postEventsHitToStats();
@@ -89,6 +91,7 @@ public class EventServiceImpl implements EventService {
         eventShortDtoList.forEach(eventShortDto -> eventShortDto.setViews(getEventViewsById(eventShortDto.getId())));
 
         //TODO STATS - get
+        //   "/stats?start={start}&end={end}&uris={uris}&unique={unique}")
 
         if (page.getSort().isUnsorted()) {
             eventShortDtoList = eventShortDtoList.stream()
@@ -100,35 +103,31 @@ public class EventServiceImpl implements EventService {
         return eventShortDtoList;
     }
 
-    //TODO перенести POST Hit в контроллер?
-    private void postEventsHitToStats() {
+    private void postHitToStats(HttpServletRequest request) {
         statsClient.post()
                 .uri("/hit")
-                .bodyValue(new EndpointHit(0L, "main-server", "/events", "IP", LocalDateTime.now()))
-                .retrieve();
-    }
-
-    //TODO перенести POST Hit в контроллер?
-    private void postEventIdHitToStats(Long id) {
-        statsClient.post()
-                .uri("/hit")
-                .bodyValue(new EndpointHit(0L, "main-server", "/event/" + id, "IP", LocalDateTime.now()))
+                .bodyValue(new EndpointHit(0L,
+                        "main-server",
+                        request.getRequestURI(),
+                        request.getRemoteAddr(),
+                        LocalDateTime.now()))
                 .retrieve();
     }
 
     @Override
-    public EventFullDto getEventById(Long id) throws EventNotFoundException, EventTimeException {
+    public EventFullDto getEventById(Long id, HttpServletRequest httpServletRequest)
+            throws EventNotFoundException {
         Event event = eventRepository.findByIdAndPublishedOnIsNotNull(id).orElseThrow(()
                 -> new EventNotFoundException(id));
 
-        //информация о событии должна включать в себя количество просмотров и количество подтвержденных запросов
-
-        postEventIdHitToStats(id);
+        postHitToStats(httpServletRequest);
         //TODO
         Long views = statsClient.get()
-                .uri("/stats?start={start}&end={end}&uris={uris}&unique={unique}")
+                .uri(uriBuilder -> uriBuilder.path("/stats")
+                        .queryParam("uris", httpServletRequest.getRequestURI())
+                        .build())
                 .retrieve()
-                .bodyToMono(ViewStats.class)
+                .bodyToMono(ViewStatsDto.class)
                 .block()
                 .getHits();
 

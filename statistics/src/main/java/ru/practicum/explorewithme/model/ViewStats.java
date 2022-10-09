@@ -1,23 +1,10 @@
 package ru.practicum.explorewithme.model;
 
-import lombok.*;
-import org.springframework.validation.annotation.Validated;
+public interface ViewStats {
 
-/**
- * ViewStats
- */
-@Validated
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString
-@EqualsAndHashCode
-public class ViewStats   {
+    String getApp();
 
-  private String app;
+    String getUri();
 
-  private String uri;
-
-  private Long hits;
+    Long getHits();
 }

@@ -6,6 +6,7 @@ import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.EventFullDto;
 import ru.practicum.explorewithme.model.event.EventShortDto;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,7 +18,9 @@ public interface EventService {
                                        LocalDateTime rangeStart, LocalDateTime rangeEnd,
                                        Boolean onlyAvailable,
                                        String sort,
-                                       Integer from, Integer size) throws EventTimeException;
+                                       Integer from, Integer size,
+                                       HttpServletRequest httpServletRequest) throws EventTimeException;
 
-    EventFullDto getEventById(Long id) throws EventNotFoundException, EventTimeException;
+    EventFullDto getEventById(Long id, HttpServletRequest httpServletRequest)
+            throws EventNotFoundException, EventTimeException;
 }
