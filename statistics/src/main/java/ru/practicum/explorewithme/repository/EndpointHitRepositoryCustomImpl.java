@@ -30,7 +30,7 @@ public class EndpointHitRepositoryCustomImpl implements EndpointHitRepositoryCus
             Predicate predicateForRange = cb.between(hitRoot.get("timestamp"), start, end);
             predicates.add(predicateForRange);
         }
-        if (uris != null) {
+        if (uris != null && !uris.isEmpty()) {
             CriteriaBuilder.In<String> predicateForUris = cb.in(hitRoot.get("uri"));
             for (String uri : uris) {
                 predicateForUris.value(uri);

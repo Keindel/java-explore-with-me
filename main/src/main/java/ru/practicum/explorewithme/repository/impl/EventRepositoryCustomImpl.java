@@ -58,10 +58,10 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
         return new PageImpl<>(eventList, page, countTotal);
     }
 
-    private static void processListOfIdsToPredicate(List<Long> users, CriteriaBuilder cb, Root<Event> eventRoot, String initiator, List<Predicate> predicates) {
-        if (users != null) {
-            CriteriaBuilder.In<Long> predicateForUsers = cb.in(eventRoot.get(initiator).get("id"));
-            for (Long user : users) {
+    private static void processListOfIdsToPredicate(List<Long> ids, CriteriaBuilder cb, Root<Event> eventRoot, String field, List<Predicate> predicates) {
+        if (ids != null && !ids.isEmpty()) {
+            CriteriaBuilder.In<Long> predicateForUsers = cb.in(eventRoot.get(field).get("id"));
+            for (Long user : ids) {
                 predicateForUsers.value(user);
             }
             predicates.add(predicateForUsers);
@@ -69,7 +69,7 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
     }
 
     private static void processStatesToPredicates(List<State> states, CriteriaBuilder cb, Root<Event> eventRoot, List<Predicate> predicates) {
-        if (states != null) {
+        if (states != null && !states.isEmpty()) {
             CriteriaBuilder.In<State> predicateForStates = cb.in(eventRoot.get("state"));
             for (State state : states) {
                 predicateForStates.value(state);

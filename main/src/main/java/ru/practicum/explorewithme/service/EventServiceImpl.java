@@ -1,7 +1,6 @@
 package ru.practicum.explorewithme.service;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -11,16 +10,15 @@ import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
 import ru.practicum.explorewithme.mapper.EventMapper;
 import ru.practicum.explorewithme.model.EndpointHit;
 import ru.practicum.explorewithme.model.ViewStats;
-import ru.practicum.explorewithme.model.ViewStatsDto;
 import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.EventFullDto;
 import ru.practicum.explorewithme.model.event.EventShortDto;
-import ru.practicum.explorewithme.repository.CategoryRepository;
 import ru.practicum.explorewithme.repository.EventRepository;
 import ru.practicum.explorewithme.util.CustomPageable;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,7 +29,8 @@ public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
 
-    private final WebClient statsClient = WebClient.create("${statistics-server.url}");
+//    private final WebClient statsClient = WebClient.create("${statistics-server.url}");
+    private final WebClient statsClient = WebClient.create("http://localhost:5432/exploredb");
 
     private final EventMapper eventMapper;
 
@@ -44,13 +43,9 @@ public class EventServiceImpl implements EventService {
                                               String stringSort,
                                               Integer from, Integer size,
                                               HttpServletRequest httpServletRequest) throws EventTimeException {
+        //TODO check
+        postHitToStats(httpServletRequest);
 
-        //TODO
-        // postEventsHitToStats();
-        /*
-         * информация о каждом событии должна включать в себя количество просмотров и количество уже одобренных заявок на участие
-         * информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики
-         * */
         rangeStart = (rangeStart == null ? LocalDateTime.now() : rangeStart);
         rangeEnd = (rangeEnd == null ? LocalDateTime.MAX : rangeEnd);
         if (rangeStart.isAfter(rangeEnd)) {
@@ -83,6 +78,19 @@ public class EventServiceImpl implements EventService {
         }
         List<EventShortDto> eventShortDtoList = eventList.stream()
                 .map(eventMapper::mapToShortDto).collect(Collectors.toList());
+
+        List<String> uriList = new ArrayList<>();
+        eventShortDtoList.forEach(eventShortDto -> uriList.add("/events/" + eventShortDto.getId()));
+
+        //TODO check
+        List<ViewStats> viewStatsList = statsClient.get()
+                .uri(uriBuilder -> uriBuilder.path("/stats")
+                        .queryParam("uris", uriList)
+                        .build())
+                .retrieve()
+                .bodyToFlux(ViewStats.class)
+                .collect(Collectors.toList())
+                .block();
 
         // TODO getEventViewsById(Long id)
 //        eventShortDtoList.forEach(eventShortDto -> eventShortDto.setViews(getEventViewsById(eventShortDto.getId())));
@@ -118,7 +126,7 @@ public class EventServiceImpl implements EventService {
                 -> new EventNotFoundException(id));
 
         postHitToStats(httpServletRequest);
-        //TODO
+        //TODO check
         Long views = statsClient.get()
                 .uri(uriBuilder -> uriBuilder.path("/stats")
                         .queryParam("uris", List.of(httpServletRequest.getRequestURI()))

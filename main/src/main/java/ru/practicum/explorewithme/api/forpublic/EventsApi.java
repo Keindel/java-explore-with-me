@@ -16,6 +16,7 @@ import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
 import ru.practicum.explorewithme.model.event.EventFullDto;
 import ru.practicum.explorewithme.model.event.EventShortDto;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,7 +27,9 @@ public interface EventsApi {
     @RequestMapping(value = "/events/{id}",
             produces = {"application/json"},
             method = RequestMethod.GET)
-    ResponseEntity<EventFullDto> getEventById(@PathVariable("id") Long id) throws EventNotFoundException, EventTimeException;
+    ResponseEntity<EventFullDto> getEventById(@PathVariable("id") Long id,
+                                              HttpServletRequest httpServletRequest)
+            throws EventNotFoundException, EventTimeException;
 
     @RequestMapping(value = "/events",
             produces = {"application/json"},
@@ -39,6 +42,8 @@ public interface EventsApi {
                                                        @Valid @RequestParam(value = "onlyAvailable", required = false, defaultValue = "false") Boolean onlyAvailable,
                                                        @Valid @RequestParam(value = "sort", required = false) String sort,
                                                        @Valid @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
-                                                       @Valid @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) throws EventTimeException;
+                                                       @Valid @RequestParam(value = "size", required = false, defaultValue = "10") Integer size,
+                                                       HttpServletRequest httpServletRequest)
+            throws EventTimeException;
 }
 
