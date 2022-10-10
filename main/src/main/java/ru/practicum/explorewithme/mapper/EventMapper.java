@@ -5,11 +5,17 @@ import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 import ru.practicum.explorewithme.exceptions.notfound.CategoryNotFoundException;
+import ru.practicum.explorewithme.model.ViewStatsDto;
 import ru.practicum.explorewithme.model.event.*;
 import ru.practicum.explorewithme.model.category.Category;
 import ru.practicum.explorewithme.model.participationrequest.Status;
 import ru.practicum.explorewithme.repository.CategoryRepository;
 import ru.practicum.explorewithme.repository.ParticipationRequestRepository;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -74,5 +80,38 @@ public class EventMapper {
         }
         eventShortDto.setViews(views);
         return eventShortDto;
+    }
+
+    //TODO ask mentor
+    /*
+     реализация все за один запрос в Stats-server, чтобы не было roundup-ов на каждый Event -
+     забираются все нужные ViewStats сразу
+     + учитывается, что для некоторых Event может не быть записей о просмотрах
+     */
+    public List<EventShortDto> mapToEventShortDtoList(List<Event> eventList, List<ViewStatsDto> viewsList) {
+        Map<Long, Long> eventIdToHitsMap = getEventIdToHitsMap(viewsList);
+        return eventList.stream()
+                .map(event -> this.mapToShortDto(event,
+                        eventIdToHitsMap.getOrDefault(event.getId(), 0L)))
+                .collect(Collectors.toList());
+    }
+
+    private static Map<Long, Long> getEventIdToHitsMap(List<ViewStatsDto> viewsList) {
+        Map<Long, Long> eventIdToHitsMap = new HashMap<>();
+        for (ViewStatsDto viewStatsDto : viewsList) {
+            String[] uriSplit = viewStatsDto.getUri().split("/");
+            int uriSplitLen = uriSplit.length;
+            Long eventId = Long.parseLong(uriSplit[uriSplitLen - 1]);
+            eventIdToHitsMap.put(eventId, viewStatsDto.getHits());
+        }
+        return eventIdToHitsMap;
+    }
+
+    public List<EventFullDto> mapToEventFullDtoList(List<Event> eventList, List<ViewStatsDto> viewsList) {
+        Map<Long, Long> eventIdToHitsMap = getEventIdToHitsMap(viewsList);
+        return eventList.stream()
+                .map(event -> this.mapToFullDto(event,
+                        eventIdToHitsMap.getOrDefault(event.getId(), 0L)))
+                .collect(Collectors.toList());
     }
 }

@@ -15,6 +15,7 @@ import ru.practicum.explorewithme.mapper.EventMapper;
 import ru.practicum.explorewithme.model.event.AdminUpdateEventRequest;
 import ru.practicum.explorewithme.model.category.CategoryDto;
 import ru.practicum.explorewithme.model.compilation.CompilationDto;
+import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.EventFullDto;
 import ru.practicum.explorewithme.model.category.NewCategoryDto;
 import ru.practicum.explorewithme.model.compilation.NewCompilationDto;
@@ -25,6 +26,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import ru.practicum.explorewithme.service.AdminService;
 import ru.practicum.explorewithme.mapper.ListModelMapper;
+import ru.practicum.explorewithme.statsclient.UriListMaker;
+import ru.practicum.explorewithme.statsclient.ViewsStatsRetriever;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
@@ -46,6 +49,10 @@ public class AdminApiController implements AdminApi {
     private final ListModelMapper listModelMapper;
 
     private final AdminService adminService;
+
+    private final UriListMaker uriListMaker;
+
+    private final ViewsStatsRetriever viewsStatsRetriever;
 
     @PostMapping("/categories")
     public ResponseEntity<CategoryDto> addCategory(@Valid @RequestBody NewCategoryDto newCategoryDto) {
@@ -81,6 +88,7 @@ public class AdminApiController implements AdminApi {
     public ResponseEntity<List<UserDto>> getUsers(@Valid @RequestParam(value = "ids", required = false) List<Long> ids,
                                                   @Valid @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
                                                   @Valid @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
+
         return new ResponseEntity<>(listModelMapper.mapList(adminService.getUsers(ids, from, size), UserDto.class),
                 HttpStatus.OK);
     }
@@ -96,9 +104,11 @@ public class AdminApiController implements AdminApi {
                                                                 @Valid @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
                                                                 @Valid @RequestParam(value = "size", required = false, defaultValue = "10") Integer size)
             throws EventTimeException {
-        return new ResponseEntity<>((adminService.
-                getEventsDetailed(users, states, categories, rangeStart, rangeEnd, from, size)
-                .stream().map(eventMapper::mapToFullDto).collect(Collectors.toList())),
+
+        List<Event> eventList = adminService.
+                getEventsDetailed(users, states, categories, rangeStart, rangeEnd, from, size);
+        return new ResponseEntity<>(eventMapper.mapToEventFullDtoList(eventList,
+                viewsStatsRetriever.retrieveViewsList(uriListMaker.make(eventList))),
                 HttpStatus.OK);
     }
 
@@ -106,21 +116,32 @@ public class AdminApiController implements AdminApi {
     public ResponseEntity<EventFullDto> updateEvent(@PathVariable("eventId") Long eventId,
                                                     @Valid @RequestBody AdminUpdateEventRequest adminUpdateEventRequest)
             throws RequestLogicException, EventNotFoundException {
-        return new ResponseEntity<>(eventMapper.mapToFullDto(adminService.updateEvent(eventId, adminUpdateEventRequest)),
+
+        Event event = adminService.updateEvent(eventId, adminUpdateEventRequest);
+        return new ResponseEntity<>(composeEventFullDto(event),
                 HttpStatus.OK);
     }
 
     @PatchMapping("/events/{eventId}/publish")
     public ResponseEntity<EventFullDto> publishEvent(@PathVariable("eventId") Long eventId)
             throws EventTimeException, ForbiddenException, EventNotFoundException {
-        return new ResponseEntity<>(eventMapper.mapToFullDto(adminService.publishEvent(eventId)),
+
+        Event event = adminService.publishEvent(eventId);
+        return new ResponseEntity<>(composeEventFullDto(event),
                 HttpStatus.OK);
+    }
+
+    private EventFullDto composeEventFullDto(Event event) {
+        return eventMapper.mapToFullDto(event,
+                viewsStatsRetriever.retrieveHitsForEvent(uriListMaker.make(List.of(event)), event));
     }
 
     @PatchMapping("/events/{eventId}/reject")
     public ResponseEntity<EventFullDto> rejectEvent(@PathVariable("eventId") Long eventId)
             throws ForbiddenException, EventNotFoundException {
-        return new ResponseEntity<>(eventMapper.mapToFullDto(adminService.rejectEvent(eventId)),
+
+        Event event = adminService.rejectEvent(eventId);
+        return new ResponseEntity<>(composeEventFullDto(event),
                 HttpStatus.OK);
     }
 

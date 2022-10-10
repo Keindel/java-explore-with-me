@@ -13,20 +13,18 @@ import ru.practicum.explorewithme.exceptions.notfound.ParticipationRequestNotFou
 import ru.practicum.explorewithme.exceptions.notfound.UserNotFoundException;
 import ru.practicum.explorewithme.mapper.EventMapper;
 import ru.practicum.explorewithme.mapper.ParticipationMapper;
-import ru.practicum.explorewithme.model.event.EventFullDto;
-import ru.practicum.explorewithme.model.event.EventShortDto;
-import ru.practicum.explorewithme.model.event.NewEventDto;
+import ru.practicum.explorewithme.model.event.*;
 import ru.practicum.explorewithme.model.participationrequest.ParticipationRequestDto;
-import ru.practicum.explorewithme.model.event.UpdateEventRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import ru.practicum.explorewithme.service.UserService;
 import ru.practicum.explorewithme.mapper.ListModelMapper;
+import ru.practicum.explorewithme.statsclient.UriListMaker;
+import ru.practicum.explorewithme.statsclient.ViewsStatsRetriever;
 
 import javax.validation.constraints.*;
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -44,13 +42,18 @@ public class UsersApiController implements UsersApi {
 
     private final UserService userService;
 
+    private final UriListMaker uriListMaker;
+
+    private final ViewsStatsRetriever viewsStatsRetriever;
+
     @GetMapping("/{userId}/events")
     public ResponseEntity<List<EventShortDto>> getEventsAddedByCurrentUser(@PathVariable("userId") Long userId,
                                                                            @Valid @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
                                                                            @Valid @RequestParam(value = "size", required = false, defaultValue = "10") Integer size) {
-        return new ResponseEntity<>(userService
-                .getEventsAddedByCurrentUser(userId, from, size)
-                .stream().map(eventMapper::mapToShortDto).collect(Collectors.toList()),
+
+        List<Event> eventList = userService.getEventsAddedByCurrentUser(userId, from, size);
+        return new ResponseEntity<>(eventMapper.mapToEventShortDtoList(eventList,
+                viewsStatsRetriever.retrieveViewsList(uriListMaker.make(eventList))),
                 HttpStatus.OK);
     }
 
@@ -58,8 +61,9 @@ public class UsersApiController implements UsersApi {
     public ResponseEntity<EventFullDto> updateEventOfCurrentUser(@PathVariable("userId") Long userId,
                                                                  @Valid @RequestBody UpdateEventRequest updateEventRequest)
             throws ForbiddenException, RequestLogicException, EventNotFoundException {
-        return new ResponseEntity<>(modelMapper.map(userService.updateEventOfCurrentUser(userId, updateEventRequest),
-                EventFullDto.class),
+
+        Event event = userService.updateEventOfCurrentUser(userId, updateEventRequest);
+        return new ResponseEntity<>(composeEventFullDto(event),
                 HttpStatus.OK);
     }
 
@@ -67,7 +71,10 @@ public class UsersApiController implements UsersApi {
     public ResponseEntity<EventFullDto> addEvent(@PathVariable("userId") Long userId,
                                                  @Valid @RequestBody NewEventDto newEventDto)
             throws EventTimeException, UserNotFoundException, CategoryNotFoundException {
-        return new ResponseEntity<>(eventMapper.mapToFullDto(userService.addEvent(userId, newEventDto)),
+
+        Event event = userService.addEvent(userId, newEventDto);
+        // при создании число просмотров 0
+        return new ResponseEntity<>(eventMapper.mapToFullDto(event, 0L),
                 HttpStatus.OK);
     }
 
@@ -75,17 +82,24 @@ public class UsersApiController implements UsersApi {
     public ResponseEntity<EventFullDto> getEventOfCurrentUser(@PathVariable("userId") Long userId,
                                                               @PathVariable("eventId") Long eventId)
             throws UserNotFoundException, ForbiddenException, EventNotFoundException {
-        return new ResponseEntity<>(modelMapper.map(userService.getEventOfCurrentUser(userId, eventId),
-                EventFullDto.class),
+
+        Event event = userService.getEventOfCurrentUser(userId, eventId);
+        return new ResponseEntity<>(composeEventFullDto(event),
                 HttpStatus.OK);
+    }
+
+    private EventFullDto composeEventFullDto(Event event) {
+        return eventMapper.mapToFullDto(event,
+                viewsStatsRetriever.retrieveHitsForEvent(uriListMaker.make(List.of(event)), event));
     }
 
     @PatchMapping("/{userId}/events/{eventId}")
     public ResponseEntity<EventFullDto> cancelEventOfCurrentUser(@PathVariable("userId") Long userId,
                                                                  @PathVariable("eventId") Long eventId)
             throws UserNotFoundException, ForbiddenException, EventNotFoundException {
-        return new ResponseEntity<>(modelMapper.map(userService.cancelEventOfCurrentUser(userId, eventId),
-                EventFullDto.class),
+
+        Event event = userService.cancelEventOfCurrentUser(userId, eventId);
+        return new ResponseEntity<>(composeEventFullDto(event),
                 HttpStatus.OK);
     }
 
