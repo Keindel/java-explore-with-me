@@ -29,10 +29,10 @@ public class StatisticsServiceImpl implements StatisticsService {
         if (Boolean.TRUE.equals(unique)) {
             return repository.getViewStatsListByParamsUnique(start, end, uris);
         }
-        List<ViewStatsDto> testList = repository.getViewStatsListByParamsCustom(start,
+        /*List<ViewStatsDto> testList = repository.getViewStatsListByParamsCustom(start,
                 end,
                 uris,
-                unique);
+                unique);*/
         return repository.getViewStatsListByParams(start, end, uris);
     }
 

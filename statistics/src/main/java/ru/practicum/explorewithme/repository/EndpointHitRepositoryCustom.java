@@ -8,8 +8,8 @@ import java.util.List;
 
 public interface EndpointHitRepositoryCustom {
 
-    List<ViewStatsDto> getViewStatsListByParamsCustom(LocalDateTime start,
+    /*List<ViewStatsDto> getViewStatsListByParamsCustom(LocalDateTime start,
                                                 LocalDateTime end,
                                                 List<String> uris,
-                                                Boolean unique);
+                                                Boolean unique);*/
 }

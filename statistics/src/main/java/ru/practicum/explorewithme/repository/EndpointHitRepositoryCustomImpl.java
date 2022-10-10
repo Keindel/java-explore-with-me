@@ -17,7 +17,7 @@ public class EndpointHitRepositoryCustomImpl implements EndpointHitRepositoryCus
     private final EntityManager entityManager;
 
     // TODO ask mentor
-    @Override
+    /*@Override
     public List<ViewStatsDto> getViewStatsListByParamsCustom(LocalDateTime start,
                                                              LocalDateTime end,
                                                              List<String> uris,
@@ -76,5 +76,5 @@ public class EndpointHitRepositoryCustomImpl implements EndpointHitRepositoryCus
 //                .getResultList();
 
         return authors;
-    }
+    }*/
 }

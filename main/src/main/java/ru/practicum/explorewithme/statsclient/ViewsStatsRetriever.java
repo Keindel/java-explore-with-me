@@ -9,6 +9,7 @@ import ru.practicum.explorewithme.model.event.Event;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -18,8 +19,10 @@ public class ViewsStatsRetriever {
     private final WebClient statsClient;
     private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+    public static LocalDateTime STATS_SERVER_BORN = LocalDateTime.of(2022, 1, 1, 0, 0);
+
     public Long retrieveHitsForEvent(List<String> uris, Event event) {
-        return statsClient.get()
+        ViewStatsDto viewStatsDto = statsClient.get()
                 .uri(uriBuilder -> uriBuilder.path("/stats")
                         .queryParam("start", event.getCreatedOn()
                                 .format(dateTimeFormatter))
@@ -29,12 +32,15 @@ public class ViewsStatsRetriever {
                         .build())
                 .retrieve()
                 .bodyToFlux(ViewStatsDto.class)
-                .blockFirst()
-                .getHits();
+                .blockFirst();
+        if (viewStatsDto == null) {
+            return 0L;
+        }
+        return viewStatsDto.getHits();
     }
 
     public List<ViewStatsDto> retrieveViewsList(List<String> uris) {
-        LocalDateTime statsDateStart = LocalDateTime.MIN;
+        LocalDateTime statsDateStart = STATS_SERVER_BORN;
         LocalDateTime statsDateEnd = LocalDateTime.now();
         return statsClient.get()
                 .uri(uriBuilder -> uriBuilder.path("/stats")
