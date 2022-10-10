@@ -12,15 +12,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class EndpointHitRepositoryCustomImpl implements EndpointHitRepositoryCustom{
+public class EndpointHitRepositoryCustomImpl implements EndpointHitRepositoryCustom {
 
     private final EntityManager entityManager;
 
+    // TODO ask mentor
     @Override
-    public List<ViewStats> getViewStatsListByParams(LocalDateTime start,
-                                                    LocalDateTime end,
-                                                    List<String> uris,
-                                                    Boolean unique) {
+    public List<ViewStatsDto> getViewStatsListByParamsCustom(LocalDateTime start,
+                                                             LocalDateTime end,
+                                                             List<String> uris,
+                                                             Boolean unique) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<EndpointHit> cqHit = cb.createQuery(EndpointHit.class);
         Root<EndpointHit> hitRoot = cqHit.from(EndpointHit.class);
@@ -41,13 +42,39 @@ public class EndpointHitRepositoryCustomImpl implements EndpointHitRepositoryCus
         if (Boolean.TRUE.equals(unique)) {
             countHits = cb.countDistinct(hitRoot.get("ip"));
         }
-        CriteriaQuery<ViewStats> cqViews = cb.createQuery(ViewStats.class);
-        List<ViewStats> viewStatsList = entityManager.createQuery(cqViews
-                        .multiselect(hitRoot.get("app"), hitRoot.get("uri"), countHits.alias("hits"))
+
+        CriteriaQuery<ViewStatsDto> cqViews = cb.createQuery(ViewStatsDto.class);
+//        Root<ViewStats> viewsRoot = cqViews.from(ViewStats.class);
+
+        CriteriaQuery<Long> cqLong = cb.createQuery(Long.class);
+        cb.count(cqLong.from(EndpointHit.class));
+        countHits = cb.count(cqLong.from(EndpointHit.class));
+
+        CriteriaQuery<ViewStatsDto> q = cb.createQuery(ViewStatsDto.class);
+        Root<EndpointHit> root = q.from(EndpointHit.class);
+
+        Selection selectionUri = root.get("uri");
+        q.select(cb.construct(ViewStatsDto.class, root.get("app"), root.get("uri"), countHits))
+                .groupBy();
+
+        List<ViewStatsDto> authors = entityManager.createQuery(q).getResultList();
+
+        List<ViewStatsDto> viewStatsList = entityManager.createQuery(cqViews
+                        .multiselect(cb.construct(ViewStatsDto.class, hitRoot.get("app"), hitRoot.get("uri"), countHits.alias("hits")))
                         .where(predicates.toArray(new Predicate[predicates.size()]))
-                        .groupBy(hitRoot.get("uri")))
+                        .groupBy(hitRoot.get("uri"), hitRoot.get("app")))
                 .getResultList();
 
-        return viewStatsList;
+
+//        CriteriaQuery<Object[]> cqObj = cb.createQuery(Object[].class);
+//        Root<ViewStats> objRoot = cqViews.from(ViewStats.class);
+//
+//        List<Object[]> viewStatsList = entityManager.createQuery(cqObj
+//                        .multiselect(hitRoot.get("app"), hitRoot.get("uri"), countHits.alias("hits"))
+//                        .where(predicates.toArray(new Predicate[predicates.size()]))
+//                        .groupBy(hitRoot.get("uri")))
+//                .getResultList();
+
+        return authors;
     }
 }

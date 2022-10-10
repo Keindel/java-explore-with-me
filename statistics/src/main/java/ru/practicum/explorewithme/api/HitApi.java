@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import ru.practicum.explorewithme.model.EndpointHit;
+import ru.practicum.explorewithme.model.EndpointHitDto;
 
 import javax.validation.Valid;
 
@@ -20,7 +21,7 @@ public interface HitApi {
     @RequestMapping(value = "/hit",
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<EndpointHit> hit(@Valid @RequestBody EndpointHit body);
+    ResponseEntity<EndpointHit> hit(@Valid @RequestBody EndpointHitDto endpointHitDto);
 
 }
 

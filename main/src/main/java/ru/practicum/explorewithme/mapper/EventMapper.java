@@ -52,17 +52,18 @@ public class EventMapper {
         return categoryRepository.findById(catId).orElseThrow(() -> new CategoryNotFoundException(catId));
     }
 
-    public EventFullDto mapToFullDto(Event event) {
+    public EventFullDto mapToFullDto(Event event, Long views) {
         EventFullDto eventFullDto = modelMapper.map(event, EventFullDto.class);
         if (Boolean.FALSE.equals(event.getRequestModeration())) {
             eventFullDto.setConfirmedRequests(requestRepository.countPendingAndConfirmedByEvent(event));
         } else {
             eventFullDto.setConfirmedRequests(requestRepository.countByStatusAndEvent(Status.CONFIRMED, event));
         }
+        eventFullDto.setViews(views);
         return eventFullDto;
     }
 
-    public EventShortDto mapToShortDto(Event event) {
+    public EventShortDto mapToShortDto(Event event, Long views) {
         EventShortDto eventShortDto = modelMapper.map(event, EventShortDto.class);
         if (Boolean.FALSE.equals(event.getRequestModeration())
                 || event.getParticipantLimit() == 0) {
@@ -71,6 +72,7 @@ public class EventMapper {
         } else {
             eventShortDto.setConfirmedRequests(requestRepository.countByStatusAndEvent(Status.CONFIRMED, event));
         }
+        eventShortDto.setViews(views);
         return eventShortDto;
     }
 }

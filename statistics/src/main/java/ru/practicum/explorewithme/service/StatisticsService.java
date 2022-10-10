@@ -1,7 +1,9 @@
 package ru.practicum.explorewithme.service;
 
 import ru.practicum.explorewithme.model.EndpointHit;
+import ru.practicum.explorewithme.model.EndpointHitDto;
 import ru.practicum.explorewithme.model.ViewStats;
+import ru.practicum.explorewithme.model.ViewStatsDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -9,9 +11,9 @@ import java.util.List;
 public interface StatisticsService {
 
     List<ViewStats> getViewStatsList(LocalDateTime start,
-                                     LocalDateTime end,
-                                     List<String> uris,
-                                     Boolean unique);
+                                        LocalDateTime end,
+                                        List<String> uris,
+                                        Boolean unique);
 
-    EndpointHit addHit(EndpointHit endpointHit);
+    EndpointHit addHit(EndpointHitDto endpointHitDto);
 }

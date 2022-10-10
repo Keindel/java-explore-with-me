@@ -1,5 +1,4 @@
-DROP TABLE IF EXISTS endpoint_hit,
-    location_areas,
+DROP TABLE IF EXISTS location_areas,
     compile_events_coupling,
     participation_requests,
     events,
@@ -24,24 +23,24 @@ CREATE TABLE IF NOT EXISTS locations
 CREATE TABLE IF NOT EXISTS users
 (
     id    BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
-    name  VARCHAR(128)                                     NOT NULL,
-    email VARCHAR(128) UNIQUE                              NOT NULL
+    name  VARCHAR(128)                                    NOT NULL,
+    email VARCHAR(128) UNIQUE                             NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS compilations
 (
     id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
     pinned BOOLEAN                                         NOT NULL,
-    title  VARCHAR(512)                                     NOT NULL
+    title  VARCHAR(512)                                    NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS events
 (
     id                 BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
-    annotation         VARCHAR(512)                                     NOT NULL,
+    annotation         VARCHAR(512)                                    NOT NULL,
     category_id        INT REFERENCES categories (id) ON DELETE NO ACTION,
     created_on         TIMESTAMP                                       NOT NULL,
-    description        VARCHAR(1024)                                    NOT NULL,
+    description        VARCHAR(1024)                                   NOT NULL,
     event_date         TIMESTAMP                                       NOT NULL,
     initiator_id       BIGINT REFERENCES users (id) ON DELETE NO ACTION,
     location_id        BIGINT REFERENCES locations (id) ON DELETE NO ACTION,

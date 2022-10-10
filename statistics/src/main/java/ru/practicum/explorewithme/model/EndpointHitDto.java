@@ -1,28 +1,27 @@
 package ru.practicum.explorewithme.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
-/**
- * ViewStats
- */
+import javax.persistence.*;
+import java.time.LocalDateTime;
+
+
 @Validated
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-@EqualsAndHashCode
-public class ViewStatsDto {
+public class EndpointHitDto {
 
   private String app;
 
   private String uri;
 
-  private Long hits;
+  private String ip;
 
-  public ViewStatsDto(String app, String uri) {
-    this.app = app;
-    this.uri = uri;
-  }
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  private LocalDateTime timestamp;
 }

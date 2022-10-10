@@ -27,6 +27,7 @@ public class StatsApiController implements StatsApi {
 
     private final StatisticsService statisticsService;
 
+    @GetMapping
     public ResponseEntity<List<ViewStats>> getStats(@NotNull @Valid @RequestParam(value = "start", required = true)
                                                     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
                                                     @NotNull @Valid @RequestParam(value = "end", required = true)
