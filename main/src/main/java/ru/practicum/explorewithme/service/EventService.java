@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface EventService {
-    
     List<EventShortDto> getEventsShort(String text,
                                        List<Long> categories,
                                        Boolean paid,

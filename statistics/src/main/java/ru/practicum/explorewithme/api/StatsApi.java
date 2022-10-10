@@ -21,12 +21,12 @@ import java.util.List;
 public interface StatsApi {
 
     @RequestMapping(value = "/stats",
-        produces = { "application/json" }, 
-        method = RequestMethod.GET)
+            produces = {"application/json"},
+            method = RequestMethod.GET)
     ResponseEntity<List<ViewStats>> getStats(@NotNull @Valid @RequestParam(value = "start") LocalDateTime start,
                                              @NotNull @Valid @RequestParam(value = "end") LocalDateTime end,
                                              @Valid @RequestParam(value = "uris", required = false) List<String> uris,
-                                             @Valid @RequestParam(value = "unique", required = false, defaultValue="false") Boolean unique);
+                                             @Valid @RequestParam(value = "unique", required = false, defaultValue = "false") Boolean unique);
 
 }
 

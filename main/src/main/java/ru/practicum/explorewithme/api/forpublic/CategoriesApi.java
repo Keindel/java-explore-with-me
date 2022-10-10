@@ -21,14 +21,14 @@ import java.util.List;
 public interface CategoriesApi {
 
     @RequestMapping(value = "/categories",
-        produces = { "application/json" }, 
-        method = RequestMethod.GET)
-    ResponseEntity<List<CategoryDto>> getCategories(@Valid @RequestParam(value = "from", required = false, defaultValue="0") Integer from,
-                                                    @Valid @RequestParam(value = "size", required = false, defaultValue="10") Integer size);
+            produces = {"application/json"},
+            method = RequestMethod.GET)
+    ResponseEntity<List<CategoryDto>> getCategories(@Valid @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
+                                                    @Valid @RequestParam(value = "size", required = false, defaultValue = "10") Integer size);
 
     @RequestMapping(value = "/categories/{catId}",
-        produces = { "application/json" }, 
-        method = RequestMethod.GET)
+            produces = {"application/json"},
+            method = RequestMethod.GET)
     ResponseEntity<CategoryDto> getCategoryById(@PathVariable("catId") Long catId) throws CategoryNotFoundException;
 }
 

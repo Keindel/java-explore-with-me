@@ -104,8 +104,8 @@ public class AdminApiController implements AdminApi {
                                                                 @Valid @RequestParam(value = "size", required = false, defaultValue = "10") Integer size)
             throws EventTimeException {
 
-        List<Event> eventList = adminService.
-                getEventsDetailed(users, states, categories, rangeStart, rangeEnd, from, size);
+        List<Event> eventList = adminService
+                .getEventsDetailed(users, states, categories, rangeStart, rangeEnd, from, size);
         return new ResponseEntity<>(eventMapper.mapToEventFullDtoList(eventList,
                 viewsStatsRetriever.retrieveViewsList(uriListMaker.make(eventList))),
                 HttpStatus.OK);

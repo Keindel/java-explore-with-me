@@ -19,8 +19,8 @@ import javax.validation.Valid;
 public interface HitApi {
 
     @RequestMapping(value = "/hit",
-        consumes = { "application/json" }, 
-        method = RequestMethod.POST)
+            consumes = {"application/json"},
+            method = RequestMethod.POST)
     ResponseEntity<EndpointHit> hit(@Valid @RequestBody EndpointHitDto endpointHitDto);
 
 }

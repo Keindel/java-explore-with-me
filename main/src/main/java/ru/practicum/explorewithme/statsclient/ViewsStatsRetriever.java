@@ -19,7 +19,7 @@ public class ViewsStatsRetriever {
 
     private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public static LocalDateTime STATS_SERVER_BORN = LocalDateTime.of(2022, 1, 1, 0, 0);
+    public static final LocalDateTime STATS_SERVER_BORN = LocalDateTime.of(2022, 1, 1, 0, 0);
 
     public Long retrieveHitsForEvent(List<String> uris, Event event) {
         ViewStatsDto viewStatsDto = statsClient.get()

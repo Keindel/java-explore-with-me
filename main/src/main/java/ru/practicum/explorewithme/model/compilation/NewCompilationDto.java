@@ -17,14 +17,14 @@ import java.util.List;
 @NoArgsConstructor
 @ToString
 @EqualsAndHashCode
-public class NewCompilationDto   {
+public class NewCompilationDto {
 
-  @NotNull
-  private List<Long> events ;
+    @NotNull
+    private List<Long> events;
 
-  @NotNull
-  private Boolean pinned;
+    @NotNull
+    private Boolean pinned;
 
-  @NotBlank
-  private String title;
+    @NotBlank
+    private String title;
 }
