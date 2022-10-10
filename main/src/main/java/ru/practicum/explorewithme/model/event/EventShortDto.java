@@ -1,16 +1,11 @@
 package ru.practicum.explorewithme.model.event;
 
-import java.time.LocalDateTime;
-import java.util.Objects;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 import ru.practicum.explorewithme.model.category.CategoryDto;
 import ru.practicum.explorewithme.model.user.UserShortDto;
 
-import javax.validation.Valid;
-import javax.validation.constraints.*;
+import java.time.LocalDateTime;
 
 /**
  * Краткая информация о событии

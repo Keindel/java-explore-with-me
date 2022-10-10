@@ -2,7 +2,6 @@ package ru.practicum.explorewithme.service;
 
 import ru.practicum.explorewithme.exceptions.EventTimeException;
 import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
-import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.EventFullDto;
 import ru.practicum.explorewithme.model.event.EventShortDto;
 

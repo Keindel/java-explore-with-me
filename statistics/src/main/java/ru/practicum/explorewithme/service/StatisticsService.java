@@ -3,7 +3,6 @@ package ru.practicum.explorewithme.service;
 import ru.practicum.explorewithme.model.EndpointHit;
 import ru.practicum.explorewithme.model.EndpointHitDto;
 import ru.practicum.explorewithme.model.ViewStats;
-import ru.practicum.explorewithme.model.ViewStatsDto;
 
 import java.time.LocalDateTime;
 import java.util.List;

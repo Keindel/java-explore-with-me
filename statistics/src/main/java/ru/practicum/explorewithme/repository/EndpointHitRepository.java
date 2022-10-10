@@ -8,7 +8,7 @@ import ru.practicum.explorewithme.model.ViewStats;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface EndpointHitRepository extends JpaRepository<EndpointHit, Long>, EndpointHitRepositoryCustom {
+public interface EndpointHitRepository extends JpaRepository<EndpointHit, Long> {
 
     @Query("SELECT e.app AS app, e.uri AS uri, count(e.uri) AS hits " +
             "FROM EndpointHit e " +

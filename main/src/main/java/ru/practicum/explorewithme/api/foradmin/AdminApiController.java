@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.explorewithme.exceptions.EventTimeException;
 import ru.practicum.explorewithme.exceptions.ForbiddenException;
@@ -12,27 +14,24 @@ import ru.practicum.explorewithme.exceptions.notfound.CompilationNotFoundExcepti
 import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
 import ru.practicum.explorewithme.mapper.CompilationMapper;
 import ru.practicum.explorewithme.mapper.EventMapper;
-import ru.practicum.explorewithme.model.event.AdminUpdateEventRequest;
+import ru.practicum.explorewithme.mapper.ListModelMapper;
 import ru.practicum.explorewithme.model.category.CategoryDto;
+import ru.practicum.explorewithme.model.category.NewCategoryDto;
 import ru.practicum.explorewithme.model.compilation.CompilationDto;
+import ru.practicum.explorewithme.model.compilation.NewCompilationDto;
+import ru.practicum.explorewithme.model.event.AdminUpdateEventRequest;
 import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.EventFullDto;
-import ru.practicum.explorewithme.model.category.NewCategoryDto;
-import ru.practicum.explorewithme.model.compilation.NewCompilationDto;
 import ru.practicum.explorewithme.model.event.State;
 import ru.practicum.explorewithme.model.user.NewUserRequest;
 import ru.practicum.explorewithme.model.user.UserDto;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import ru.practicum.explorewithme.service.AdminService;
-import ru.practicum.explorewithme.mapper.ListModelMapper;
 import ru.practicum.explorewithme.statsclient.UriListMaker;
 import ru.practicum.explorewithme.statsclient.ViewsStatsRetriever;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController

@@ -6,12 +6,10 @@ import org.springframework.stereotype.Service;
 import ru.practicum.explorewithme.model.EndpointHit;
 import ru.practicum.explorewithme.model.EndpointHitDto;
 import ru.practicum.explorewithme.model.ViewStats;
-import ru.practicum.explorewithme.model.ViewStatsDto;
 import ru.practicum.explorewithme.repository.EndpointHitRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

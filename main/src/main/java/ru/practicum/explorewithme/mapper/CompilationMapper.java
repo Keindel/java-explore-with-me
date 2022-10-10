@@ -11,7 +11,6 @@ import ru.practicum.explorewithme.statsclient.UriListMaker;
 import ru.practicum.explorewithme.statsclient.ViewsStatsRetriever;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor

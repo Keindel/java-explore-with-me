@@ -143,7 +143,7 @@ public class UsersApiController implements UsersApi {
     @PostMapping("/{userId}/requests")
     public ResponseEntity<ParticipationRequestDto> addParticipationRequest(
             @PathVariable("userId") Long userId,
-            @NotNull @Valid @RequestParam(value = "eventId", required = true) Long eventId)
+            @NotNull @Valid @RequestParam(value = "eventId") Long eventId)
             throws UserNotFoundException, RequestLogicException, EventNotFoundException {
         return new ResponseEntity<>(participationMapper
                 .mapToParticipationRequestDto(userService.addParticipationRequest(userId, eventId)),

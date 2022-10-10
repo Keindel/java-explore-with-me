@@ -5,9 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.*;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * Сведения об ошибке

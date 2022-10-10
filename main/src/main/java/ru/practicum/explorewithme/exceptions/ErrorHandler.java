@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.explorewithme.exceptions.notfound.*;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Map;
 
 @RestControllerAdvice(basePackages = {"ru.practicum.explorewithme.service"})
 public class ErrorHandler {

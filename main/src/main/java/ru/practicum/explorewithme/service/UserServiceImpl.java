@@ -1,14 +1,13 @@
 package ru.practicum.explorewithme.service;
 
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.practicum.explorewithme.exceptions.ForbiddenException;
-import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
 import ru.practicum.explorewithme.exceptions.EventTimeException;
+import ru.practicum.explorewithme.exceptions.ForbiddenException;
 import ru.practicum.explorewithme.exceptions.RequestLogicException;
+import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
 import ru.practicum.explorewithme.exceptions.notfound.ParticipationRequestNotFoundException;
 import ru.practicum.explorewithme.exceptions.notfound.UserNotFoundException;
 import ru.practicum.explorewithme.mapper.EventMapper;
@@ -31,8 +30,6 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final ModelMapper modelMapper;
-
     private final EventMapper eventMapper;
 
     private final UserRepository userRepository;
@@ -40,8 +37,6 @@ public class UserServiceImpl implements UserService {
     private final EventRepository eventRepository;
 
     private final LocationRepository locationRepository;
-
-    private final CategoryRepository categoryRepository;
 
     private final ParticipationRequestRepository participationRequestRepository;
 
