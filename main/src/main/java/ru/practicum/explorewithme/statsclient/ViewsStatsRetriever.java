@@ -9,7 +9,6 @@ import ru.practicum.explorewithme.model.event.Event;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -17,6 +16,7 @@ import java.util.stream.Collectors;
 public class ViewsStatsRetriever {
 
     private final WebClient statsClient;
+
     private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static LocalDateTime STATS_SERVER_BORN = LocalDateTime.of(2022, 1, 1, 0, 0);

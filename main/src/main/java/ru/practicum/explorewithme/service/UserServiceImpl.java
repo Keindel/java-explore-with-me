@@ -153,9 +153,9 @@ public class UserServiceImpl implements UserService {
         }
         req.setStatus(Status.CONFIRMED);
         req = participationRequestRepository.save(req);
+        confirmedRequestsNumber++;
         // если при подтверждении данной заявки, лимит заявок для события исчерпан, то все неподтверждённые заявки необходимо отклонить
-        if (confirmedRequestsNumber == event.getParticipantLimit() - 1) {
-            //TODO check Hibernate generated SQL; replace for SQL Query?
+        if (confirmedRequestsNumber >= event.getParticipantLimit()) {
             participationRequestRepository.findAllByStatusAndEvent(Status.PENDING, event)
                     .stream().peek(r -> r.setStatus(Status.CANCELED)).forEach(participationRequestRepository::save);
         }
