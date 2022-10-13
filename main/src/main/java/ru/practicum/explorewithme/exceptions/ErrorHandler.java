@@ -26,7 +26,7 @@ public class ErrorHandler {
         return new ApiError(e.getStackTrace(),
                 e.getMessage(),
                 NOT_FOUND,
-                ApiError.StatusEnum._404_NOT_FOUND,
+                HttpStatus.NOT_FOUND,
                 LocalDateTime.now());
     }
 
@@ -36,7 +36,7 @@ public class ErrorHandler {
         return new ApiError(e.getStackTrace(),
                 e.getMessage(),
                 CONDITIONS_NOT_MET,
-                ApiError.StatusEnum._409_CONFLICT,
+                HttpStatus.CONFLICT,
                 LocalDateTime.now());
     }
 
@@ -46,7 +46,7 @@ public class ErrorHandler {
         return new ApiError(e.getStackTrace(),
                 e.getMessage(),
                 CONDITIONS_NOT_MET,
-                ApiError.StatusEnum._403_FORBIDDEN,
+                HttpStatus.FORBIDDEN,
                 LocalDateTime.now());
     }
 
@@ -56,7 +56,7 @@ public class ErrorHandler {
         return new ApiError(e.getStackTrace(),
                 e.getMessage(),
                 CONDITIONS_NOT_MET,
-                ApiError.StatusEnum._406_NOT_ACCEPTABLE,
+                HttpStatus.NOT_ACCEPTABLE,
                 LocalDateTime.now());
     }
 }

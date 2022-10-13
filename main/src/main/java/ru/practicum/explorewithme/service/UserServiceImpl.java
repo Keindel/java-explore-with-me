@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explorewithme.exceptions.EventTimeException;
 import ru.practicum.explorewithme.exceptions.ForbiddenException;
 import ru.practicum.explorewithme.exceptions.RequestLogicException;
@@ -47,6 +48,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public Event updateEventOfCurrentUser(Long userId, UpdateEventRequest updateEventRequest)
             throws EventNotFoundException, ForbiddenException, RequestLogicException {
         Long eventId = updateEventRequest.getEventId();
@@ -78,6 +80,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public Event addEvent(Long userId, NewEventDto newEventDto) throws EventTimeException, UserNotFoundException {
         if (newEventDto.getEventDate().minusHours(2).isBefore(LocalDateTime.now())) {
             throw new EventTimeException("Only pending or canceled events can be changed");
@@ -112,6 +115,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public Event cancelEventOfCurrentUser(Long userId, Long eventId)
             throws UserNotFoundException, EventNotFoundException, ForbiddenException {
         Event event = getEventCheckedByOwner(userId, eventId);
@@ -130,6 +134,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public ParticipationRequest confirmParticipationRequest(Long userId, Long eventId, Long reqId)
             throws UserNotFoundException, EventNotFoundException, ParticipationRequestNotFoundException, ForbiddenException, RequestLogicException {
         Event event = getEventCheckedByOwner(userId, eventId);
@@ -158,6 +163,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public ParticipationRequest rejectParticipationRequest(Long userId, Long eventId, Long reqId)
             throws UserNotFoundException, ForbiddenException, EventNotFoundException, ParticipationRequestNotFoundException {
         Event event = getEventCheckedByOwner(userId, eventId);
@@ -177,6 +183,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public ParticipationRequest addParticipationRequest(Long userId, Long eventId) throws UserNotFoundException, EventNotFoundException, RequestLogicException {
         // нельзя добавить повторный запрос - реализовано на уровне БД как UNIQUE(user_id, event_id)
         User currentUser = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
@@ -212,6 +219,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public ParticipationRequest cancelRequest(Long userId, Long requestId)
             throws UserNotFoundException, ParticipationRequestNotFoundException, ForbiddenException {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));

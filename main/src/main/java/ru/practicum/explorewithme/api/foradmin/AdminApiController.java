@@ -69,7 +69,8 @@ public class AdminApiController implements AdminApi {
 
     @DeleteMapping("/categories/{catId}")
     public ResponseEntity<Void> deleteCategory(@PathVariable("catId") Long catId) {
-        return new ResponseEntity<>(adminService.deleteCategory(catId));
+        adminService.deleteCategory(catId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/users")
@@ -80,7 +81,8 @@ public class AdminApiController implements AdminApi {
 
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable("userId") Long userId) {
-        return new ResponseEntity<>(adminService.deleteUser(userId));
+        adminService.deleteUser(userId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/users")
@@ -153,32 +155,37 @@ public class AdminApiController implements AdminApi {
 
     @DeleteMapping("/compilations/{compId}")
     public ResponseEntity<Void> deleteCompilation(@PathVariable("compId") Long compId) {
-        return new ResponseEntity<>(adminService.deleteCompilation(compId));
+        adminService.deleteCompilation(compId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/compilations/{compId}/events/{eventId}")
     public ResponseEntity<Void> removeEventFromCompilation(@PathVariable("compId") Long compId,
                                                            @PathVariable("eventId") Long eventId)
             throws CompilationNotFoundException, EventNotFoundException {
-        return new ResponseEntity<>(adminService.removeEventFromCompilation(compId, eventId));
+        adminService.removeEventFromCompilation(compId, eventId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PatchMapping("/compilations/{compId}/events/{eventId}")
     public ResponseEntity<Void> addEventToCompilation(@PathVariable("compId") Long compId,
                                                       @PathVariable("eventId") Long eventId)
             throws CompilationNotFoundException, EventNotFoundException {
-        return new ResponseEntity<>(adminService.addEventToCompilation(compId, eventId));
+        adminService.addEventToCompilation(compId, eventId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/compilations/{compId}/pin")
     public ResponseEntity<Void> unpinCompilation(@PathVariable("compId") Long compId)
             throws CompilationNotFoundException {
-        return new ResponseEntity<>(adminService.unpinCompilation(compId));
+        adminService.unpinCompilation(compId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PatchMapping("/compilations/{compId}/pin")
     public ResponseEntity<Void> pinCompilation(@PathVariable("compId") Long compId)
             throws CompilationNotFoundException {
-        return new ResponseEntity<>(adminService.pinCompilation(compId));
+        adminService.pinCompilation(compId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

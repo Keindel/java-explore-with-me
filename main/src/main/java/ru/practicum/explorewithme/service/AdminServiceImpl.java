@@ -3,20 +3,20 @@ package ru.practicum.explorewithme.service;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.explorewithme.exceptions.EventTimeException;
 import ru.practicum.explorewithme.exceptions.ForbiddenException;
 import ru.practicum.explorewithme.exceptions.RequestLogicException;
 import ru.practicum.explorewithme.exceptions.notfound.CompilationNotFoundException;
 import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
 import ru.practicum.explorewithme.mapper.EventMapper;
-import ru.practicum.explorewithme.model.event.AdminUpdateEventRequest;
 import ru.practicum.explorewithme.model.category.Category;
 import ru.practicum.explorewithme.model.category.CategoryDto;
 import ru.practicum.explorewithme.model.category.NewCategoryDto;
 import ru.practicum.explorewithme.model.compilation.Compilation;
 import ru.practicum.explorewithme.model.compilation.NewCompilationDto;
+import ru.practicum.explorewithme.model.event.AdminUpdateEventRequest;
 import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.State;
 import ru.practicum.explorewithme.model.participationrequest.Status;
@@ -48,30 +48,33 @@ public class AdminServiceImpl implements AdminService {
     private final ParticipationRequestRepository participationRequestRepository;
 
     @Override
+    @Transactional
     public Category addCategory(NewCategoryDto newCategoryDto) {
         return categoryRepository.save(modelMapper.map(newCategoryDto, Category.class));
     }
 
     @Override
-    public HttpStatus deleteCategory(Long catId) {
+    @Transactional
+    public void deleteCategory(Long catId) {
         categoryRepository.deleteById(catId);
-        return HttpStatus.OK;
     }
 
     @Override
+    @Transactional
     public Category updateCategory(CategoryDto categoryDto) {
         return categoryRepository.save(modelMapper.map(categoryDto, Category.class));
     }
 
     @Override
+    @Transactional
     public User registerUser(NewUserRequest newUserRequest) {
         return userRepository.save(modelMapper.map(newUserRequest, User.class));
     }
 
     @Override
-    public HttpStatus deleteUser(Long userId) {
+    @Transactional
+    public void deleteUser(Long userId) {
         userRepository.deleteById(userId);
-        return HttpStatus.OK;
     }
 
     @Override
@@ -100,16 +103,15 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional
     public Event updateEvent(Long eventId, AdminUpdateEventRequest adminUpdateEventRequest)
             throws EventNotFoundException, RequestLogicException {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
         Integer newParticipantLimit = adminUpdateEventRequest.getParticipantLimit();
-//            Long checkNumber = participationRequestRepository.countByStatusAndEvent(Status.CONFIRMED, event);
+        Long checkNumber = participationRequestRepository.countByStatusAndEvent(Status.CONFIRMED, event);
         if (newParticipantLimit != null
-//                && newParticipantLimit < participationRequestRepository.findAllByStatusAndEvent(Status.CONFIRMED, event).size()) {
                 && newParticipantLimit != 0
-                //TODO check
-                && newParticipantLimit < participationRequestRepository.countByStatusAndEvent(Status.CONFIRMED, event)) {
+                && newParticipantLimit < checkNumber) {
             throw new RequestLogicException("new request limit can't be less than current number of confirmed requests");
         }
         Event eventUpdate = eventMapper.mapFromUpdateToEvent(adminUpdateEventRequest, event);
@@ -117,6 +119,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional
     public Event publishEvent(Long eventId) throws EventNotFoundException, ForbiddenException, EventTimeException {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
         if (event.getState() != State.PENDING) {
@@ -132,6 +135,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional
     public Event rejectEvent(Long eventId) throws ForbiddenException, EventNotFoundException {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
         if (event.getState() == State.PUBLISHED) {
@@ -142,6 +146,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional
     public Compilation saveCompilation(NewCompilationDto newCompilationDto) throws EventNotFoundException {
         List<Long> eventIds = newCompilationDto.getEvents();
         List<Event> events = new ArrayList<>();
@@ -154,49 +159,48 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public HttpStatus deleteCompilation(Long compId) {
+    @Transactional
+    public void deleteCompilation(Long compId) {
         compilationRepository.deleteById(compId);
-        return HttpStatus.OK;
     }
 
     @Override
-    public HttpStatus removeEventFromCompilation(Long compId, Long eventId)
+    @Transactional
+    public void removeEventFromCompilation(Long compId, Long eventId)
             throws EventNotFoundException, CompilationNotFoundException {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
         Compilation compilation = compilationRepository.findById(compId).orElseThrow(()
                 -> new CompilationNotFoundException(compId));
-        //TODO check
         compilation.getEvents().remove(event);
         compilationRepository.save(compilation);
-        return HttpStatus.OK;
     }
 
     @Override
-    public HttpStatus addEventToCompilation(Long compId, Long eventId)
+    @Transactional
+    public void addEventToCompilation(Long compId, Long eventId)
             throws EventNotFoundException, CompilationNotFoundException {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
         Compilation compilation = compilationRepository.findById(compId).orElseThrow(()
                 -> new CompilationNotFoundException(compId));
         compilation.getEvents().add(event);
         compilationRepository.save(compilation);
-        return HttpStatus.OK;
     }
 
     @Override
-    public HttpStatus unpinCompilation(Long compId) throws CompilationNotFoundException {
+    @Transactional
+    public void unpinCompilation(Long compId) throws CompilationNotFoundException {
         Compilation compilation = compilationRepository.findById(compId).orElseThrow(()
                 -> new CompilationNotFoundException(compId));
         compilation.setPinned(false);
         compilationRepository.save(compilation);
-        return HttpStatus.OK;
     }
 
     @Override
-    public HttpStatus pinCompilation(Long compId) throws CompilationNotFoundException {
+    @Transactional
+    public void pinCompilation(Long compId) throws CompilationNotFoundException {
         Compilation compilation = compilationRepository.findById(compId).orElseThrow(()
                 -> new CompilationNotFoundException(compId));
         compilation.setPinned(true);
         compilationRepository.save(compilation);
-        return HttpStatus.OK;
     }
 }

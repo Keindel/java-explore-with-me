@@ -31,6 +31,6 @@ public class Category {
 
     @Override
     public int hashCode() {
-        return getClass().hashCode() + Objects.hashCode(id);
+        return Objects.hashCode(id);
     }
 }

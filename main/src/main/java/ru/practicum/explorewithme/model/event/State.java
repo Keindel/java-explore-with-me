@@ -17,13 +17,4 @@ public enum State {
     public String toString() {
         return String.valueOf(value);
     }
-
-    public static State fromValue(String text) {
-        for (State b : State.values()) {
-            if (String.valueOf(b.value).equals(text)) {
-                return b;
-            }
-        }
-        return null;
-    }
 }
