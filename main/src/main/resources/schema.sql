@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS location_areas
     id     BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
     lat    DECIMAL(9, 6)                                   NOT NULL,
     lon    DECIMAL(9, 6)                                   NOT NULL,
-    name   VARCHAR(128),
+    name   VARCHAR(128) UNIQUE                             NOT NULL,
     radius INT
 );
 
@@ -86,10 +86,10 @@ CREATE OR REPLACE FUNCTION distance(lat1 float, lon1 float, lat2 float, lon2 flo
 AS
 '
     declare
-        dist float = 0;
-        rad_lat1 float;
-        rad_lat2 float;
-        theta float;
+        dist      float = 0;
+        rad_lat1  float;
+        rad_lat2  float;
+        theta     float;
         rad_theta float;
     BEGIN
         IF lat1 = lat2 AND lon1 = lon2
@@ -108,7 +108,8 @@ AS
             dist = sin(rad_lat1) * sin(rad_lat2) + cos(rad_lat1) * cos(rad_lat2) * cos(rad_theta);
 
             IF dist > 1
-            THEN dist = 1;
+            THEN
+                dist = 1;
             END IF;
 
             dist = acos(dist);

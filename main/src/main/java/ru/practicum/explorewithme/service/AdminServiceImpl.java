@@ -215,6 +215,11 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    public void deleteArea(Long areaId) {
+        locationAreaRepository.deleteById(areaId);
+    }
+
+    @Override
     public List<LocationArea> getAreas() {
         return locationAreaRepository.findAll();
     }

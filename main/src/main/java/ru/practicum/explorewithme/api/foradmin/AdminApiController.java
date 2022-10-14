@@ -188,19 +188,25 @@ public class AdminApiController implements AdminApi {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/locationareas")
+    @PostMapping("/areas")
     public ResponseEntity<LocationArea> addArea(@Valid @RequestBody LocationArea locationArea) {
         return new ResponseEntity<>(adminService.addArea(locationArea),
                 HttpStatus.OK);
     }
 
-    @GetMapping("/locationareas")
+    @DeleteMapping("/areas/{areaId}")
+    public ResponseEntity<Void> addArea(@PathVariable Long areaId) {
+        adminService.deleteArea(areaId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/areas")
     public ResponseEntity<List<LocationArea>> getAreas() {
         return new ResponseEntity<>(adminService.getAreas(),
                 HttpStatus.OK);
     }
 
-    @GetMapping("/locationareas/{areaId}/events")
+    @GetMapping("/areas/{areaId}/events")
     public ResponseEntity<List<EventShortDto>> getEventsInArea(@PathVariable Long areaId) throws LocationAreaNotFoundException {
         List<Event> eventList = adminService.getEventsInArea(areaId);
         return new ResponseEntity<>(eventMapper.mapToEventShortDtoList(eventList,

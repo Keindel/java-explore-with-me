@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public Event addEvent(Long userId, NewEventDto newEventDto) throws EventTimeException, UserNotFoundException {
         if (newEventDto.getEventDate().minusHours(2).isBefore(LocalDateTime.now())) {
-            throw new EventTimeException("Only pending or canceled events can be changed");
+            throw new EventTimeException("Event date shall be at least 2 hours later than current time");
         }
         Event event = eventMapper.mapToEvent(newEventDto, null);
         Location location = locationRepository.save(newEventDto.getLocation());

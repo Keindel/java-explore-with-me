@@ -13,7 +13,6 @@ import ru.practicum.explorewithme.model.compilation.Compilation;
 import ru.practicum.explorewithme.model.compilation.NewCompilationDto;
 import ru.practicum.explorewithme.model.event.AdminUpdateEventRequest;
 import ru.practicum.explorewithme.model.event.Event;
-import ru.practicum.explorewithme.model.event.EventShortDto;
 import ru.practicum.explorewithme.model.event.State;
 import ru.practicum.explorewithme.model.location.LocationArea;
 import ru.practicum.explorewithme.model.user.NewUserRequest;
@@ -64,4 +63,6 @@ public interface AdminService {
     List<LocationArea> getAreas();
 
     List<Event> getEventsInArea(Long areaId) throws LocationAreaNotFoundException;
+
+    void deleteArea(Long areaId);
 }
