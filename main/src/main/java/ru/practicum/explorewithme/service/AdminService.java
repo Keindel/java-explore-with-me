@@ -5,6 +5,7 @@ import ru.practicum.explorewithme.exceptions.ForbiddenException;
 import ru.practicum.explorewithme.exceptions.RequestLogicException;
 import ru.practicum.explorewithme.exceptions.notfound.CompilationNotFoundException;
 import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
+import ru.practicum.explorewithme.exceptions.notfound.LocationAreaNotFoundException;
 import ru.practicum.explorewithme.model.category.Category;
 import ru.practicum.explorewithme.model.category.CategoryDto;
 import ru.practicum.explorewithme.model.category.NewCategoryDto;
@@ -12,7 +13,9 @@ import ru.practicum.explorewithme.model.compilation.Compilation;
 import ru.practicum.explorewithme.model.compilation.NewCompilationDto;
 import ru.practicum.explorewithme.model.event.AdminUpdateEventRequest;
 import ru.practicum.explorewithme.model.event.Event;
+import ru.practicum.explorewithme.model.event.EventShortDto;
 import ru.practicum.explorewithme.model.event.State;
+import ru.practicum.explorewithme.model.location.LocationArea;
 import ru.practicum.explorewithme.model.user.NewUserRequest;
 import ru.practicum.explorewithme.model.user.User;
 
@@ -55,4 +58,10 @@ public interface AdminService {
     void unpinCompilation(Long compId) throws CompilationNotFoundException;
 
     void pinCompilation(Long compId) throws CompilationNotFoundException;
+
+    LocationArea addArea(LocationArea locationArea);
+
+    List<LocationArea> getAreas();
+
+    List<Event> getEventsInArea(Long areaId) throws LocationAreaNotFoundException;
 }

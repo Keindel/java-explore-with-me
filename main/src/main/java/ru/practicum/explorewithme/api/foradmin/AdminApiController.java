@@ -12,6 +12,7 @@ import ru.practicum.explorewithme.exceptions.ForbiddenException;
 import ru.practicum.explorewithme.exceptions.RequestLogicException;
 import ru.practicum.explorewithme.exceptions.notfound.CompilationNotFoundException;
 import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
+import ru.practicum.explorewithme.exceptions.notfound.LocationAreaNotFoundException;
 import ru.practicum.explorewithme.mapper.CompilationMapper;
 import ru.practicum.explorewithme.mapper.EventMapper;
 import ru.practicum.explorewithme.mapper.ListModelMapper;
@@ -19,10 +20,8 @@ import ru.practicum.explorewithme.model.category.CategoryDto;
 import ru.practicum.explorewithme.model.category.NewCategoryDto;
 import ru.practicum.explorewithme.model.compilation.CompilationDto;
 import ru.practicum.explorewithme.model.compilation.NewCompilationDto;
-import ru.practicum.explorewithme.model.event.AdminUpdateEventRequest;
-import ru.practicum.explorewithme.model.event.Event;
-import ru.practicum.explorewithme.model.event.EventFullDto;
-import ru.practicum.explorewithme.model.event.State;
+import ru.practicum.explorewithme.model.event.*;
+import ru.practicum.explorewithme.model.location.LocationArea;
 import ru.practicum.explorewithme.model.user.NewUserRequest;
 import ru.practicum.explorewithme.model.user.UserDto;
 import ru.practicum.explorewithme.service.AdminService;
@@ -187,5 +186,25 @@ public class AdminApiController implements AdminApi {
             throws CompilationNotFoundException {
         adminService.pinCompilation(compId);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/locationareas")
+    public ResponseEntity<LocationArea> addArea(@Valid @RequestBody LocationArea locationArea) {
+        return new ResponseEntity<>(adminService.addArea(locationArea),
+                HttpStatus.OK);
+    }
+
+    @GetMapping("/locationareas")
+    public ResponseEntity<List<LocationArea>> getAreas() {
+        return new ResponseEntity<>(adminService.getAreas(),
+                HttpStatus.OK);
+    }
+
+    @GetMapping("/locationareas/{areaId}/events")
+    public ResponseEntity<List<EventShortDto>> getEventsInArea(@PathVariable Long areaId) throws LocationAreaNotFoundException {
+        List<Event> eventList = adminService.getEventsInArea(areaId);
+        return new ResponseEntity<>(eventMapper.mapToEventShortDtoList(eventList,
+                viewsStatsRetriever.retrieveViewsList(uriListMaker.make(eventList))),
+                HttpStatus.OK);
     }
 }

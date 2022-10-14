@@ -5,6 +5,8 @@ import org.hibernate.Hibernate;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -32,8 +34,12 @@ public class LocationArea {
   @NotNull
   private BigDecimal lon;
 
+  @NotNull
+  @NotBlank
   private String name;
 
+  @NotNull
+  @Min(1)
   private Integer radius;
 
   @Override
