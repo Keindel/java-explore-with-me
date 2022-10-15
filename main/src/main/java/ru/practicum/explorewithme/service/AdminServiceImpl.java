@@ -10,6 +10,7 @@ import ru.practicum.explorewithme.exceptions.ForbiddenException;
 import ru.practicum.explorewithme.exceptions.RequestLogicException;
 import ru.practicum.explorewithme.exceptions.notfound.CompilationNotFoundException;
 import ru.practicum.explorewithme.exceptions.notfound.EventNotFoundException;
+import ru.practicum.explorewithme.exceptions.notfound.LocationAreaNotFoundException;
 import ru.practicum.explorewithme.mapper.EventMapper;
 import ru.practicum.explorewithme.model.category.Category;
 import ru.practicum.explorewithme.model.category.CategoryDto;
@@ -19,12 +20,14 @@ import ru.practicum.explorewithme.model.compilation.NewCompilationDto;
 import ru.practicum.explorewithme.model.event.AdminUpdateEventRequest;
 import ru.practicum.explorewithme.model.event.Event;
 import ru.practicum.explorewithme.model.event.State;
+import ru.practicum.explorewithme.model.location.LocationArea;
 import ru.practicum.explorewithme.model.participationrequest.Status;
 import ru.practicum.explorewithme.model.user.NewUserRequest;
 import ru.practicum.explorewithme.model.user.User;
 import ru.practicum.explorewithme.repository.*;
 import ru.practicum.explorewithme.util.CustomPageable;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +49,8 @@ public class AdminServiceImpl implements AdminService {
     private final EventRepository eventRepository;
 
     private final ParticipationRequestRepository participationRequestRepository;
+
+    private final LocationAreaRepository locationAreaRepository;
 
     @Override
     @Transactional
@@ -202,5 +207,31 @@ public class AdminServiceImpl implements AdminService {
                 -> new CompilationNotFoundException(compId));
         compilation.setPinned(true);
         compilationRepository.save(compilation);
+    }
+
+    @Override
+    public LocationArea addArea(LocationArea locationArea) {
+        return locationAreaRepository.save(locationArea);
+    }
+
+    @Override
+    public void deleteArea(Long areaId) {
+        locationAreaRepository.deleteById(areaId);
+    }
+
+    @Override
+    public List<LocationArea> getAreas() {
+        return locationAreaRepository.findAll();
+    }
+
+    @Override
+    public List<Event> getEventsInArea(Long areaId, Integer from, Integer size) throws LocationAreaNotFoundException {
+        LocationArea locationArea = locationAreaRepository.findById(areaId).orElseThrow(()
+                -> new LocationAreaNotFoundException(areaId));
+        BigDecimal lat = locationArea.getLat();
+        BigDecimal lon = locationArea.getLon();
+        Integer radiusInKm = locationArea.getRadius();
+        Pageable page = CustomPageable.of(from, size);
+        return eventRepository.findAllByAreaParams(lat, lon, radiusInKm, page).getContent();
     }
 }

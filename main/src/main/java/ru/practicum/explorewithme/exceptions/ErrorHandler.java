@@ -20,7 +20,8 @@ public class ErrorHandler {
             EventNotFoundException.class,
             LocationNotFoundException.class,
             ParticipationRequestNotFoundException.class,
-            UserNotFoundException.class})
+            UserNotFoundException.class,
+            LocationAreaNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError handleNotFound(final Exception e) {
         return new ApiError(e.getStackTrace(),
