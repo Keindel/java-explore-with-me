@@ -207,8 +207,12 @@ public class AdminApiController implements AdminApi {
     }
 
     @GetMapping("/areas/{areaId}/events")
-    public ResponseEntity<List<EventShortDto>> getEventsInArea(@PathVariable Long areaId) throws LocationAreaNotFoundException {
-        List<Event> eventList = adminService.getEventsInArea(areaId);
+    public ResponseEntity<List<EventShortDto>> getEventsInArea(@PathVariable Long areaId,
+                                                               @RequestParam(required = false, defaultValue = "0") Integer from,
+                                                               @RequestParam(required = false, defaultValue = "10") Integer size)
+            throws LocationAreaNotFoundException {
+
+        List<Event> eventList = adminService.getEventsInArea(areaId, from, size);
         return new ResponseEntity<>(eventMapper.mapToEventShortDtoList(eventList,
                 viewsStatsRetriever.retrieveViewsList(uriListMaker.make(eventList))),
                 HttpStatus.OK);

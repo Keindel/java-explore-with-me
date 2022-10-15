@@ -225,12 +225,13 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public List<Event> getEventsInArea(Long areaId) throws LocationAreaNotFoundException {
+    public List<Event> getEventsInArea(Long areaId, Integer from, Integer size) throws LocationAreaNotFoundException {
         LocationArea locationArea = locationAreaRepository.findById(areaId).orElseThrow(()
                 -> new LocationAreaNotFoundException(areaId));
         BigDecimal lat = locationArea.getLat();
         BigDecimal lon = locationArea.getLon();
         Integer radiusInKm = locationArea.getRadius();
-        return eventRepository.findAllByAreaParams(lat, lon, radiusInKm);
+        Pageable page = CustomPageable.of(from, size);
+        return eventRepository.findAllByAreaParams(lat, lon, radiusInKm, page).getContent();
     }
 }

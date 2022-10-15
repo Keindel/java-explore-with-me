@@ -62,7 +62,7 @@ public interface AdminService {
 
     List<LocationArea> getAreas();
 
-    List<Event> getEventsInArea(Long areaId) throws LocationAreaNotFoundException;
+    List<Event> getEventsInArea(Long areaId, Integer from, Integer size) throws LocationAreaNotFoundException;
 
     void deleteArea(Long areaId);
 }
