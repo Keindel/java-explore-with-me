@@ -1,6 +1,35 @@
-# java-explore-with-me
-Template repository for ExploreWithMe project.
+# _Java-explore-with-me_
 
-ER diagram https://github.com/Keindel/java-explore-with-me/blob/main/Explore-with-me%20ER%20diagram.PNG
+Бэкенд приложения **ExploreWithMe** (англ. «исследуй со мной»). Дает возможность делиться информацией об интересных событиях и помогает найти компанию для участия в них.
 
-https://github.com/Keindel/java-explore-with-me/pull/1
+Приложение является афишей, где можно предложить какое-либо событие и набрать компанию для участия в нём.
+![main front](./Front%20page%20concept.png)
+
+
+
+### _Стек технологий_
+REST API service with Spring-Boot, JPA Hibernate, PostgreSQL, Java 11, Lombok, Docker
+
+### _Диаграмма Entity relationship_
+![db ER-diagram](./Explore-with-me%20ER%20diagram.PNG)
+
+### _Микросервисы_
+1. Основной сервис — содержит всё необходимое для работы продукта.
+
+- API разделено на три части:
+  - Первая — публичная, доступна без регистрации любому пользователю сети.
+  - Вторая — закрытая, доступна только авторизованным пользователям.
+  - Третья — административная, для администраторов сервиса.
+
+2. Сервис статистики — хранит количество просмотров и позволяет делать различные выборки для анализа работы приложения.
+- собирает информацию:
+  - о количестве обращений пользователей к спискам событий
+  - о количестве запросов к подробной информации о событии
+- на основе собранной информации формируется статистика о работе приложения.
+
+### _Спецификация API_
+1. [Основной сервис (swagger)](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/Keindel/java-explore-with-me/main/ewm-main-service-spec.json)
+2. [Сервис статистики (swagger)](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/Keindel/java-explore-with-me/main/ewm-stats-service-spec.json)
+
+### _Запуск приложения_
+Находясь в корневой директории проекта вызвать команду: docker-compose up
